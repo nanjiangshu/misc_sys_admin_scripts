@@ -76,7 +76,8 @@ sudo perl -MCPAN -e 'install IPC::Run'
 sudo perl -MCPAN -e 'install Moose'
 sudo perl -MCPAN -e 'install JFIELDS/BioPerl-1.6.924.tar.gz'
 
-sudo apt-get -y  install libxslt libxslt-dev libxml2 libxml2-dev
+# solving pip install lxml problem
+sudo apt-get -y  install libxslt libxslt-dev libxml2 libxml2-dev  libxslt1-dev zlib1g-dev 
 
 
 sudo /usr/bin/pip install --upgrade --force-reinstall  lxml
@@ -91,3 +92,7 @@ yes y | sudo sendmailconfig
 
 sudo a2enmod cgi            # enable cgi script
 sudo service apache2 restart
+
+# avoid unqalified ServerName error for Ubuntu 14.04
+echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
+sudo a2enconf fqdn

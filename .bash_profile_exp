@@ -1,0 +1,41 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+
+
+export HISTSIZE=5000
+export HISTCONTROL='ignoreups'
+export HISTIGNORE="&" #do not save duplicate consecutive commands
+
+export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n$ '
+
+alias rm="rm -i "
+alias mv="mv -i "
+alias date="date '+%F  %H:%M:%S  %A  Week %V'"
+alias grep="grep --color=auto"
+alias du="du -h "
+alias df="df -h "
+alias lsd="ls -d */"
+alias ssh="ssh -Y"
+alias d='dirs -v'
+alias r='pushd +1'
+alias d0='pushd +0 > /dev/null ; dirs -v'
+alias d1='pushd +1 > /dev/null ; dirs -v'
+alias d2='pushd +2 > /dev/null ; dirs -v'
+alias d3='pushd +3 > /dev/null ; dirs -v'
+alias d4='pushd +4 > /dev/null ; dirs -v'
+alias d5='pushd +5 > /dev/null ; dirs -v'
+alias d6='pushd +6 > /dev/null ; dirs -v'
+alias d7='pushd +7 > /dev/null ; dirs -v'
+alias d8='pushd +8 > /dev/null ; dirs -v'
+alias d9='pushd +9 > /dev/null ; dirs -v'
+alias ls="ls --color "
+
+export PATH

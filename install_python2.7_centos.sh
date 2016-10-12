@@ -5,15 +5,16 @@ sudo yum groupinstall -y 'development tools'
 # sudo yum install -y zlib-devel bzip2-devel openssl-devel xz-libs wget
 sudo yum install -y zlib-devel bzip2-devel openssl-devel xz-libs wget sqlite-devel
 
-wget http://www.python.org/ftp/python/2.7.8/Python-2.7.8.tar.xz
-xz -d Python-2.7.8.tar.xz
-tar -xvf Python-2.7.8.tar
+wget http://www.python.org/ftp/python/2.7.12/Python-2.7.12.tar.xz
+xz -d Python-2.7.12.tar.xz
+tar -xvf Python-2.7.12.tar
 
 currdir=$PWD
-cd Python-2.7.8
+cd Python-2.7.12
 
 # Run the configure:
-./configure --prefix=/usr/local
+# enable shared
+./configure --enable-shared --prefix=/usr/local
 
 # compile and install it:
 make
@@ -27,7 +28,7 @@ wget --no-check-certificate https://pypi.python.org/packages/source/s/setuptools
 tar -xvf setuptools-1.4.2.tar.gz
 cd setuptools-1.4.2
 
-# Install setuptools using the Python 2.7.8:
+# Install setuptools using the Python 2.7.12:
 sudo python2.7 setup.py install
 
 cd $currdir

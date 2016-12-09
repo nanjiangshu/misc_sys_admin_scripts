@@ -18,6 +18,8 @@ sudo apt-get -y install ia32-libs  # install ia32-libs so that 32-bit programs c
 sudo apt-get -y install emboss
 sudo apt-get -y install hmmer
 sudo apt-get -y install blast2    # install blastgpg, which will be used by topcons
+sudo apt-get -y install sqlite3
+sudo apt-get -y install libsqlite3-dev
 
 
 sudo apt-get -y  install html2text #needed by pconsc submit_query.cgi
@@ -77,7 +79,12 @@ sudo perl -MCPAN -e 'install Moose'
 sudo perl -MCPAN -e 'install JFIELDS/BioPerl-1.6.924.tar.gz'
 
 # solving pip install lxml problem
-sudo apt-get -y  install libxslt libxslt-dev libxml2 libxml2-dev  libxslt1-dev zlib1g-dev 
+sudo apt-get -y  install libxslt 
+sudo apt-get -y  install libxslt-dev 
+sudo apt-get -y  install libxml2
+sudo apt-get -y  install libxml2-dev  
+sudo apt-get -y  install libxslt1-dev 
+sudo apt-get -y  install zlib1g-dev 
 
 
 sudo /usr/bin/pip install --upgrade --force-reinstall  lxml

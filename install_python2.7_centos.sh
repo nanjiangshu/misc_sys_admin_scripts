@@ -14,7 +14,7 @@ cd Python-2.7.12
 
 # Run the configure:
 # enable shared
-./configure --enable-shared --prefix=/usr/local
+./configure --enable-shared --prefix=/usr/local LDFLAGS="-Wl,--rpath=/usr/local/lib"
 
 # compile and install it:
 make

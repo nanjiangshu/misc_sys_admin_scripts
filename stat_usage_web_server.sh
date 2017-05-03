@@ -4,9 +4,11 @@
 # Description:  usage analysis of web-servers
 # Author: Nanjiang Shu (nanjiang.shu@scilifelab.se)
 
+set -e
+#set -x
 progname=`basename $0`
 size_progname=${#progname}
-wspace=`printf "%*s" $size_progname ""` 
+wspace=`printf "%*s" $size_progname ""`
 usage="
 Usage:  $progname method [method ...]
 Options:
@@ -32,21 +34,22 @@ UsageAna(){
             numUserEU=$(awk -F "\t" '{if ($3=="EU") print $2}' $anafile | wc -l )
             #echo -e "#Method\tNumUser\tNumCountry\tNumUser_EU\tPercentEU"
             percentEU=$(python -c "print float($numUserEU)/$numUser*100")
-            echo -e "$method\t$numUser\t$numCountry\t$numUser_EU\t$percentEU"
+            printf "%-9s %8d %10d %10d %10.1f\n" $method $numUser $numCountry $numUserEU $percentEU
             ;;
     esac
 }
 
 if [ $# -lt 1 ]; then
-    PrintHelp
+    echo "$usage"
     exit
 fi
 
 methodList=()
-startdate=
-enddate=
+startdate=19000000
+enddate=22000000
 
 tmpdir=$(mktemp -d /tmp/tmpdir.stat_usage_web_server.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
+
 trap 'rm -rf "$tmpdir"' INT TERM EXIT
 
 
@@ -59,7 +62,7 @@ while [ "$1" != "" ]; do
         isNonOptionArg=true
     elif [ "${1:0:1}" == "-" ]; then
         case $1 in
-            -h | --help) PrintHelp; exit;;
+            -h | --help) echo "$usage"; exit;;
             -start-date|--start-date) startdate=$2;shift;;
             -end-date|--end-date) enddate=$2;shift;;
             -q|-quiet|--quiet) isQuiet=1;;
@@ -71,6 +74,9 @@ while [ "$1" != "" ]; do
     shift
 done
 
+startdate=${startdate//-/}
+enddate=${enddate//-/}
+
 
 numMethod=${#methodList[@]}
 if [ $numMethod -eq 0  ]; then
@@ -78,7 +84,7 @@ if [ $numMethod -eq 0  ]; then
     exit 1
 fi
 
-echo -e "#Method\tNumUser\tNumCountry\tNumUser_EU\tPercentEU"
+printf "%-9s %8s %10s %10s %10s\n" "#Method" "NumUser" "NumCountry" "NumUserEU" "PercentEU"
 
 for ((i=0;i<numMethod;i++));do
     method=${methodList[$i]}

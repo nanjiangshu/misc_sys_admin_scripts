@@ -38,4 +38,9 @@ alias d8='pushd +8 > /dev/null ; dirs -v'
 alias d9='pushd +9 > /dev/null ; dirs -v'
 alias ls="ls --color "
 
+# whoami=`whoami`
+# if [ ! $whoami == "root" ];then
+#     eval `keychain --eval id_rsa_ext`
+# fi
+
 export PATH

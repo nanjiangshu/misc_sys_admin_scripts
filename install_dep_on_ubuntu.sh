@@ -63,20 +63,12 @@ sudo apt-get -y  install tree
 sudo $rundir/install_dep_django_ubuntu.sh
 
 #installing perl modules
-sudo apt-get -y  install libmoose-perl 
-# better to install with the shell
-# sudo perl -MCPAN -e shell
-# cpan > install Moose
-# cpan > install JFIELDS/BioPerl-1.6.924.tar.gz
-# cpan > install IPC::Run
-#sudo perl -MCPAN -e 'install JFIELDS/BioPerl-1.6.924.tar.gz'
-#sudo perl -MCPAN -e 'install IPC::Run'
-#sudo perl -MCPAN -e 'install Moose'
-export PERL_MM_USE_DEFAULT=1
-export PERL_EXTUTILS_AUTOINSTALL="--defaultdeps"
-sudo perl -MCPAN -e 'install IPC::Run' 
-sudo perl -MCPAN -e 'install Moose'
-sudo perl -MCPAN -e 'install JFIELDS/BioPerl-1.6.924.tar.gz'
+# using cpanm to install 
+sudo apt-get install -y perlbrew 
+perlbrew install-cpanm 
+cpanm IPC::Run
+cpanm Moose
+cpanm JFIELDS/BioPerl-1.6.924.tar.gz
 
 # solving pip install lxml problem
 sudo apt-get -y  install libxslt 

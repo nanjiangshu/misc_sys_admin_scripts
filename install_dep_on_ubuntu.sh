@@ -68,7 +68,7 @@ sudo apt-get install -y perlbrew
 perlbrew install-cpanm 
 cpanm IPC::Run
 cpanm Moose
-cpanm JFIELDS/BioPerl-1.6.924.tar.gz
+cpanm Bio::Perl
 
 # solving pip install lxml problem
 sudo apt-get -y  install libxslt 

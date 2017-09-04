@@ -49,6 +49,7 @@ sudo yum install perl-App-cpanminus.noarch
 sudo cpanm Moose
 sudo cpanm IPC::Run
 sudo cpanm Bio::Perl
+sudo cpanm CGI
 
 
 sudo /usr/bin/pip install --upgrade --force-reinstall  lxml

@@ -7,8 +7,13 @@
 #    topdir is now working with files with whitespaces
 # ChangeLog 2014-09-26
 #    using byte2human.awk as byte2human, so that it is not platform dependant
+# ChangeLog 2017-09-04
+#    using $rundir/byte2human.awk so that the byte2human.awk does not need to
+#    be in the PATH
 #}}}
 
+rundir=$(dirname $0)
+rundir=$(readlink -f $rundir)
 progname=`basename $0`
 size_progname=${#progname}
 wspace=`printf "%*s" $size_progname ""` 
@@ -24,7 +29,7 @@ OPTIONS:
   -n INT       Number of dirs to show, (default: 10)
   -h, --help   Print this help message and exit
 
-Created 2007-08-17, updated 2013-05-20, Nanjiang Shu
+Created 2007-08-17, updated 2017-09-04, Nanjiang Shu
 "
 PrintHelp() { #{{{
     echo "$usage"
@@ -61,10 +66,10 @@ ShowLargestFolderOrFile() { #{{{
         case $os in 
             Darwin|Leo*|OpenBSD*)
                 cat $tmpfile_size_fname | cut -f 1 | awk '{print $1*1024}' |\
-                    byte2human.awk > $tmpfile_size
+                    $rundir/byte2human.awk > $tmpfile_size
                 ;;
             Linux*|Cygwin*)
-                cat $tmpfile_size_fname | cut -f 1 | byte2human.awk > $tmpfile_size
+                cat $tmpfile_size_fname | cut -f 1 | $rundir/byte2human.awk > $tmpfile_size
         esac
         cat $tmpfile_size_fname | cut -f 2-  > $tmpfile_fname
         paste $tmpfile_size $tmpfile_fname
@@ -85,7 +90,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-IsProgExist byte2human.awk
+IsProgExist $rundir/byte2human.awk
 
 if [ ! -d "$path" ]; then
     echo path \'$path\' is not a directory or does not exists >&2

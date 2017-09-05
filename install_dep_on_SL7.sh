@@ -5,6 +5,8 @@ rundir=`dirname $0`
 
 sudo yum -y  install html2text #needed by pconsc submit_query.cgi
 
+sudo yum install -y redhat-lsb #to get lsb_release
+
 sudo yum -y  install httpd
 sudo yum -y  install mysql-server 
 sudo yum -y  install php php-mysql

@@ -3,7 +3,7 @@ rundir=$(readlink -f $rundir)
 
 deplist="
 https://gnupg.org/ftp/gcrypt/npth/npth-1.5.tar.bz2 
-https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.9.tar.bz2
+https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2
 https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.1.tar.bz2
 https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.4.3.tar.bz2
 https://gnupg.org/ftp/gcrypt/libksba/libksba-1.3.5.tar.bz2  

@@ -3,6 +3,9 @@
 # clean data on the web server frontend. 
 # pcons1
 # Created 2017-09-13, updated 2017-09-13, Nanjiang Shu  
+# this script is supposed to be added to the crontab as apache_user
+
+# sudo crontab -u apache_user -e  
 
 if [ -d /scratch ];then
 

@@ -9,8 +9,8 @@
 
 if [ -d /scratch ];then
 
-    find /scratch -maxdepth 1 -name "seq_*" -type d   -ctime +10 -print0 | xargs -0 sudo rm -rf
-    find /scratch -maxdepth 1 -name "boctopus2_*" -type d   -ctime +10 -print0 | xargs -0 sudo rm -rf   
+    find /scratch -maxdepth 1 -name "seq_*" -type d   -ctime +10 -print0 | xargs -0  rm -rf
+    find /scratch -maxdepth 1 -name "boctopus2_*" -type d   -ctime +10 -print0 | xargs -0 rm -rf   
 
 fi
 

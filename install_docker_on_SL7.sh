@@ -44,3 +44,5 @@ curl -L https://github.com/docker/compose/releases/download/1.16.0/docker-compos
 
 sudo cp $tmpdir/docker-compose /usr/local/bin/
 sudo chmod +x /usr/local/bin/docker-compose
+
+rm -rf $tmpdir

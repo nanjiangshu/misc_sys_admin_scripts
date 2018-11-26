@@ -24,7 +24,13 @@ UsageAna(){
     local method=$1
     case $method in 
         topcons2|proq3|pconsc3|subcons|prodres|scampi2|boctopus2)
-            infile=/var/www/html/$method/proj/pred/static/log/submitted_seq.log
+            infile1=/var/www/html/$method/proj/pred/static/log/all_submitted_seq.log
+            infile2=/var/www/html/$method/proj/pred/static/log/submitted_seq.log
+            if [ -f $infile1 ]; then
+                infile=$infile1
+            else
+                infile=$infile2
+            fi
             uniqiplistfile=$tmpdir/uniqiplist.$method.txt
             anafile=$tmpdir/uniqidlist.$method.ana.txt
             awk -F "\t" -v d1=$startdate -v d2=$enddate '{ip=$3; split($1,ss," "); date=ss[1]; gsub(/-/, "", date); if(date>=d1 && date<=d2) {print ip}}' $infile | sort -u > $uniqiplistfile

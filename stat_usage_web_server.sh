@@ -111,5 +111,5 @@ NumCountry  Number of countries the users are from
 NumUserEU   Number of users from the European countries
 PercentEU   Percentage of users that are from the European countries out of the whole world
 NumJob      Number of jobs submitted to the server
-NumSeq      Number of sequences (queries) submitted to the server, one job can have multiple sequencces.
+NumSeq      Number of sequences (queries) submitted to the server, one job can have multiple sequences.
 """

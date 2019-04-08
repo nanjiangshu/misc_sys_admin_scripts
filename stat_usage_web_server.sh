@@ -33,14 +33,18 @@ UsageAna(){
             fi
             uniqiplistfile=$tmpdir/uniqiplist.$method.txt
             anafile=$tmpdir/uniqidlist.$method.ana.txt
+            numseqfile=$tmpdir/$method.numseq.txt
             awk -F "\t" -v d1=$startdate -v d2=$enddate '{ip=$3; split($1,ss," "); date=ss[1]; gsub(/-/, "", date); if(date>=d1 && date<=d2) {print ip}}' $infile | sort -u > $uniqiplistfile
+            awk -F "\t" -v d1=$startdate -v d2=$enddate '{ip=$4; split($1,ss," "); date=ss[1]; gsub(/-/, "", date); if(date>=d1 && date<=d2) {print ip}}' $infile > $numseqfile
             my_ip2country.py -l  $uniqiplistfile -show-eu > $anafile
+            numJob=$(cat $numseqfile |wc -l)
+            numSeq=$(cat $numseqfile | awk 'BEGIN{sum=0}{sum+=$1}END{print sum}')
             numUser=$(awk -F "\t" '{print $1}' $anafile | sort -u |wc -l )
             numCountry=$(awk -F "\t" '{print $2}' $anafile | sort -u |wc -l )
             numUserEU=$(awk -F "\t" '{if ($3=="EU") print $2}' $anafile | wc -l )
             #echo -e "#Method\tNumUser\tNumCountry\tNumUser_EU\tPercentEU"
             percentEU=$(python -c "print float($numUserEU)/$numUser*100")
-            printf "%-9s %8d %10d %10d %10.1f\n" $method $numUser $numCountry $numUserEU $percentEU
+            printf "%-9s %8d %10d %10d %10.1f %10d %10d\n" $method $numUser $numCountry $numUserEU $percentEU $numJob $numSeq
             ;;
     esac
 }
@@ -80,8 +84,6 @@ while [ "$1" != "" ]; do
     shift
 done
 
-startdate=${startdate//-/}
-enddate=${enddate//-/}
 
 
 numMethod=${#methodList[@]}
@@ -90,10 +92,24 @@ if [ $numMethod -eq 0  ]; then
     exit 1
 fi
 
-printf "%-9s %8s %10s %10s %10s\n" "#Method" "NumUser" "NumCountry" "NumUserEU" "PercentEU"
+echo -e "Web server usage statistics for the period $startdate to $enddate \n"
+
+startdate=${startdate//-/}
+enddate=${enddate//-/}
+
+printf "%-9s %8s %10s %10s %10s %10s %10s\n" "#Method" "NumUser" "NumCountry" "NumUserEU" "PercentEU" "NumJob" "NumSeq"
 
 for ((i=0;i<numMethod;i++));do
     method=${methodList[$i]}
     UsageAna "$method"
 done
 
+echo """
+#==========================================================================================
+NumUser     NumUser is calculated as the unique IP address the job is submitted from
+NumCountry  Number of countries the users are from
+NumUserEU   Number of users from the European countries
+PercentEU   Percentage of users that are from the European countries out of the whole world
+NumJob      Number of jobs submitted to the server
+NumSeq      Number of sequences (queries) submitted to the server, one job can have multiple sequencces.
+"""

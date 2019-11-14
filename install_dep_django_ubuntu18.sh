@@ -1,6 +1,8 @@
 #!/bin/bash
 # 2019-11-14
 
+sudo apt-get -y install python
+sudo apt-get -y install python-dev
 sudo apt-get -y install apache2
 
 # installing mod_wsgi

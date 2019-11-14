@@ -1,6 +1,8 @@
 #!/bin/bash
 #started 2015-02-10
 
+sudo apt-get -y install python
+sudo apt-get -y install python-dev
 sudo apt-get -y install apache2
 
 # installing mod_wsgi

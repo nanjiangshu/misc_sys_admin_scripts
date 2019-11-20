@@ -21,6 +21,13 @@ pushd $tmpdir
 
 sudo ls
 
+# install dependencies
+sudo apt-get update && \
+    sudo apt-get install -y build-essential \
+    libssl-dev uuid-dev libseccomp-dev \
+    pkg-config squashfs-tools cryptsetup \
+    make gcc golang
+
 wget https://github.com/singularityware/singularity/releases/download/v$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity

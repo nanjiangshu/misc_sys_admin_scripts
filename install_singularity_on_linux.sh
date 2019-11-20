@@ -17,7 +17,6 @@ tmpdir=$(mktemp -d /tmp/tmpdir.install_singularity_on_linux.XXXXXXXXX) || { echo
 
 trap 'rm -rf "$tmpdir"' INT TERM EXIT
 
-pushd $tmpdir
 
 sudo ls
 
@@ -38,6 +37,7 @@ echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
     echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
     source ~/.bashrc
 
+pushd $tmpdir
 wget https://github.com/singularityware/singularity/releases/download/v$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity

@@ -42,7 +42,7 @@ wget https://github.com/singularityware/singularity/releases/download/v$VERSION/
 tar xvf singularity-$VERSION.tar.gz
 cd singularity
 ./mconfig
-./configure --prefix=/usr/local
+cd builddir
 make
 sudo make install
 

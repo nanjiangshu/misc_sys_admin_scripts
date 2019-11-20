@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=2.3.1
+VERSION=3.5.0
 
 usage="
 USAGE: $0 <version>
@@ -21,7 +21,7 @@ pushd $tmpdir
 
 sudo ls
 
-wget https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
+wget https://github.com/singularityware/singularity/releases/download/v$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity-$VERSION
 ./configure --prefix=/usr/local

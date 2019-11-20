@@ -26,7 +26,17 @@ sudo apt-get update && \
     sudo apt-get install -y build-essential \
     libssl-dev uuid-dev libseccomp-dev \
     pkg-config squashfs-tools cryptsetup \
-    make gcc golang
+    make gcc
+
+# install golang (at least version 1.13)
+
+export VERSION=1.13.3 OS=linux ARCH=amd64  # change this as you need
+wget -O /tmp/go${VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${VERSION}.${OS}-${ARCH}.tar.gz && \
+      sudo tar -C /usr/local -xzf /tmp/go${VERSION}.${OS}-${ARCH}.tar.gz
+
+echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
+    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
+    source ~/.bashrc
 
 wget https://github.com/singularityware/singularity/releases/download/v$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz

@@ -15,10 +15,20 @@ Options:
   -o       OUTFILE  Set output file
   -start-date STR   Set the start date for analysis, in the format 2015-01-01
   -end-date   STR   Set the end date for analysis
+  -onlydata         Show only data, no comments
   -h, --help        Print this help message and exit
 
-Created 2017-05-03, updated 2017-05-03, Nanjiang Shu
+Created 2017-05-03, updated 2020-01-09, Nanjiang Shu
 "
+
+declare -A ratioEGI
+ratioEGI['topcons2'] = "0.5"
+ratioEGI['scampi2'] = "0.2"
+ratioEGI['proq3'] = "0.3"
+ratioEGI['pconsc3'] = "1.0"
+ratioEGI['boctopus2'] = "0.25"
+ratioEGI['subcons'] = "0.25"
+ratioEGI['prodres'] = "1.0"
 
 UsageAna(){
     local method=$1
@@ -44,7 +54,7 @@ UsageAna(){
             numUserEU=$(awk -F "\t" '{if ($3=="EU") print $2}' $anafile | wc -l )
             #echo -e "#Method\tNumUser\tNumCountry\tNumUser_EU\tPercentEU"
             percentEU=$(python -c "print float($numUserEU)/$numUser*100")
-            printf "%-9s %8d %10d %10d %10.1f %10d %10d\n" $method $numUser $numCountry $numUserEU $percentEU $numJob $numSeq
+            printf "%-9s %8d %10d %10d %10.1f %10d %10d %6s\n" $method $numUser $numCountry $numUserEU $percentEU $numJob $numSeq ${ratioEGI[$method]}
             ;;
     esac
 }
@@ -57,6 +67,7 @@ fi
 methodList=()
 startdate=19000000
 enddate=22000000
+isShowOnlyData=0
 
 tmpdir=$(mktemp -d /tmp/tmpdir.stat_usage_web_server.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
 
@@ -75,6 +86,7 @@ while [ "$1" != "" ]; do
             -h | --help) echo "$usage"; exit;;
             -start-date|--start-date) startdate=$2;shift;;
             -end-date|--end-date) enddate=$2;shift;;
+            -onlydata|--onlydata) isShowOnlyData=1;;
             -q|-quiet|--quiet) isQuiet=1;;
             -*) echo Error! Wrong argument: $1 >&2; exit;;
         esac
@@ -92,19 +104,22 @@ if [ $numMethod -eq 0  ]; then
     exit 1
 fi
 
-echo -e "Web server usage statistics for the period $startdate to $enddate \n"
+if [ $isShowOnlyData -eq 0 ];then
+    echo -e "Web server usage statistics for the period $startdate to $enddate \n"
+fi
 
 startdate=${startdate//-/}
 enddate=${enddate//-/}
 
-printf "%-9s %8s %10s %10s %10s %10s %10s\n" "#Method" "NumUser" "NumCountry" "NumUserEU" "PercentEU" "NumJob" "NumSeq"
+printf "%-9s %8s %10s %10s %10s %10s %10s %6s\n" "#Method" "NumUser" "NumCountry" "NumUserEU" "PercentEU" "NumJob" "NumSeq" "RatioEGI"
 
 for ((i=0;i<numMethod;i++));do
     method=${methodList[$i]}
     UsageAna "$method"
 done
 
-echo """
+if [ $isShowOnlyData -eq 0 ];then
+    echo """
 #==========================================================================================
 NumUser     NumUser is calculated as the unique IP address the job is submitted from
 NumCountry  Number of countries the users are from
@@ -113,3 +128,4 @@ PercentEU   Percentage of users that are from the European countries out of the 
 NumJob      Number of jobs submitted to the server
 NumSeq      Number of sequences (queries) submitted to the server, one job can have multiple sequences.
 """
+fi

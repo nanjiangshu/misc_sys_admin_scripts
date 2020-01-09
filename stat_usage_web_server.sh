@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Filename: 
 # Description:  usage analysis of web-servers
@@ -21,14 +21,7 @@ Options:
 Created 2017-05-03, updated 2020-01-09, Nanjiang Shu
 "
 
-declare -A ratioEGI
-ratioEGI['topcons2'] = "0.5"
-ratioEGI['scampi2'] = "0.2"
-ratioEGI['proq3'] = "0.3"
-ratioEGI['pconsc3'] = "1.0"
-ratioEGI['boctopus2'] = "0.25"
-ratioEGI['subcons'] = "0.25"
-ratioEGI['prodres'] = "1.0"
+declare -A ratioEGI=( ["topcons2"]="0.5" ["scampi2"]="0.2" ["proq3"]="0.3" ["pconsc3"]="1.0" ["boctopus2"]="0.25" ["subcons"]="0.25" ["prodres"]="1.0" ) 
 
 UsageAna(){
     local method=$1

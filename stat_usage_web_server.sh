@@ -49,7 +49,12 @@ UsageAna(){
             numCountry=$(awk -F "\t" '{print $2}' $anafile | sort -u |wc -l )
             numUserEU=$(awk -F "\t" '{if ($3=="EU") print $2}' $anafile | wc -l )
             #echo -e "#Method\tNumUser\tNumCountry\tNumUser_EU\tPercentEU"
-            percentEU=$(python -c "print float($numUserEU)/$numUser*100")
+            if [ $numUser -eq 0 ];then
+                percentEU=0
+            else
+                percentEU=$(python -c "print float($numUserEU)/$numUser*100")
+            fi
+
             printf "%-9s %8d %10d %10d %10.1f %10d %10d %6s\n" $method $numUser $numCountry $numUserEU $percentEU $numJob $numSeq ${ratioEGI[$method]}
             ;;
     esac

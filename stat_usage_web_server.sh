@@ -16,15 +16,15 @@ Options:
   -start-date STR   Set the start date for analysis, in the format 2015-01-01
   -end-date   STR   Set the end date for analysis
   -onlydata         Show only data, no comments
-  -permonth         Do analysis per month
+  -special-country  Show number of users for specified countries
   -h, --help        Print this help message and exit
 
-Created 2017-05-03, updated 2020-01-09, Nanjiang Shu
+Created 2017-05-03, updated 2020-07-11, Nanjiang Shu
 "
 
 declare -A ratioEGI=( ["topcons2"]="0.5" ["scampi2"]="0.2" ["proq3"]="0.3" ["pconsc3"]="1.0" ["boctopus2"]="0.25" ["subcons"]="0.25" ["prodres"]="1.0" ) 
 
-UsageAna(){
+UsageAna(){  #{{{
     local method=$1
     local startdate=$2
     local enddate=$3
@@ -41,8 +41,12 @@ UsageAna(){
             anafile=$tmpdir/uniqidlist.$method.ana.txt
             numseqfile=$tmpdir/$method.numseq.txt
             awk -F "\t" -v d1=$startdate -v d2=$enddate '{ip=$3; split($1,ss," "); date=ss[1]; gsub(/-/, "", date); if(date>=d1 && date<=d2) {print ip}}' $infile | sort -u > $uniqiplistfile
+
             awk -F "\t" -v d1=$startdate -v d2=$enddate '{ip=$4; split($1,ss," "); date=ss[1]; gsub(/-/, "", date); if(date>=d1 && date<=d2) {print ip}}' $infile > $numseqfile
+
             my_ip2country.py -l  $uniqiplistfile -show-eu > $anafile
+
+
             numJob=$(cat $numseqfile |wc -l)
             numSeq=$(cat $numseqfile | awk 'BEGIN{sum=0}{sum+=$1}END{print sum}')
             numUser=$(awk -F "\t" '{print $1}' $anafile | sort -u |wc -l )
@@ -52,13 +56,20 @@ UsageAna(){
             if [ $numUser -eq 0 ];then
                 percentEU=0
             else
-                percentEU=$(python -c "print float($numUserEU)/$numUser*100")
+                percentEU=$(python -c "print (float($numUserEU)/$numUser*100)")
             fi
 
-            printf "%-9s %8d %10d %10d %10.1f %10d %10d %6s\n" $method $numUser $numCountry $numUserEU $percentEU $numJob $numSeq ${ratioEGI[$method]}
+            printf "%-9s %8d %10d %10d %10.1f" $method $numUser $numCountry $numUserEU $percentEU
+
+            for ((ic=0; ic<numSpecialCountry; ic++));do
+                country=${specialCountryList[$ic]}
+                numUserCountry=$(awk -v country=${country} -F "\t" '{if ($2==country) print $2}' $anafile | wc -l )
+                printf " %15d" $numUserCountry
+            done
+            printf " %10d %10d %6s\n" $numJob $numSeq ${ratioEGI[$method]}
             ;;
     esac
-}
+} #}}}
 
 if [ $# -lt 1 ]; then
     echo "$usage"
@@ -70,6 +81,7 @@ startdate=19000000
 enddate=22000000
 isShowOnlyData=0
 isAnaPerMonth=0
+specialCountryList=()
 
 tmpdir=$(mktemp -d /tmp/tmpdir.stat_usage_web_server.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
 
@@ -90,6 +102,7 @@ while [ "$1" != "" ]; do
             -end-date|--end-date) enddate=$2;shift;;
             -onlydata|--onlydata) isShowOnlyData=1;;
             -permonth|--permonth) isAnaPerMonth=1;;
+            -spc|--special-country) specialCountryList+=("$2");shift;;
             -q|-quiet|--quiet) isQuiet=1;;
             -*) echo Error! Wrong argument: $1 >&2; exit;;
         esac
@@ -102,6 +115,7 @@ done
 
 
 numMethod=${#methodList[@]}
+numSpecialCountry=${#specialCountryList[@]}
 if [ $numMethod -eq 0  ]; then
     echo Input not set! Exit. >&2
     exit 1
@@ -114,13 +128,18 @@ fi
 if [ $isAnaPerMonth -eq 0 ];then
     startdate=${startdate//-/}
     enddate=${enddate//-/}
-    printf "%-9s %8s %10s %10s %10s %10s %10s %6s\n" "#Method" "NumUser" "NumCountry" "NumUserEU" "PercentEU" "NumJob" "NumSeq" "RatioEGI"
-    for ((i=0;i<numMethod;i++));do
-        method=${methodList[$i]}
+    printf "%-9s %8s %10s %10s %10s" "#Method" "NumUser" "NumCountry" "NumUserEU" "PercentEU" 
+    for ((ic=0; ic< numSpecialCountry; ic++));do
+        country=${specialCountryList[$ic]}
+        printf " %15s" "NUser$country"
+    done
+    printf " %10s %10s %6s\n" "NumJob" "NumSeq" "RatioEGI"
+    for ((im=0;im<numMethod;im++));do
+        method=${methodList[$im]}
         UsageAna "$method" $startdate $enddate
     done
 else
-    continue
+    : #permonth analysis not implemented
 fi
 
 if [ $isShowOnlyData -eq 0 ];then

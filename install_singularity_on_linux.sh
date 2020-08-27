@@ -33,11 +33,13 @@ export GO_VERSION=1.13.3 OS=linux ARCH=amd64  # change this as you need
 wget -O /tmp/go${GO_VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${GO_VERSION}.${OS}-${ARCH}.tar.gz && \
       sudo tar -C /usr/local -xzf /tmp/go${GO_VERSION}.${OS}-${ARCH}.tar.gz
 
-echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
-    source ~/.bashrc
+echo 'export GOPATH=${HOME}/go' >> ~/.bashrc
+echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
 
-pushd $tmpdir
+source ~/.bashrc
+
+currdir=$PWD
+cd $tmpdir
 wget https://github.com/singularityware/singularity/releases/download/v$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity
@@ -46,6 +48,6 @@ cd builddir
 make
 sudo make install
 
-popd
+cd $currdir
 
 rm -rf $tmpdir

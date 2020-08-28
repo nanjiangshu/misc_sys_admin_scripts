@@ -11,7 +11,7 @@ $0 vdb /media/storage
 dev=$1
 mountpath=$2
 
-if [ "$dev" == "" || "$mountpath" == "" ];then
+if [ "$dev" == "" -o "$mountpath" == "" ];then
     echo "$usage"
     exit 1
 fi

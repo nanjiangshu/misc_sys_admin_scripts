@@ -18,7 +18,7 @@ fi
 
 sudo fdisk /dev/vdb # n then w
 sudo mkfs -t ext4 /dev/${dev}1 
-echo "/dev/{$dev}1  $mountpath ext4 defaults,noatime,_netdev,nofail 0 2" | sudo tee --append /etc/fstab
+echo "/dev/${dev}1  $mountpath ext4 defaults,noatime,_netdev,nofail 0 2" | sudo tee --append /etc/fstab
 sudo mkdir $mountpath
 sudo mount -a 
 

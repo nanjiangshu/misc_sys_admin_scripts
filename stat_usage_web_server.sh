@@ -30,8 +30,10 @@ UsageAna(){  #{{{
     local enddate=$3
     case $method in 
         topcons2|proq3|pconsc3|subcons|prodres|scampi2|boctopus2)
-            infile1=/var/www/html/$method/proj/pred/static/log/all_submitted_seq.log
-            infile2=/var/www/html/$method/proj/pred/static/log/submitted_seq.log
+            #infile1=/var/www/html/$method/proj/pred/static/log/all_submitted_seq.log
+            #infile2=/var/www/html/$method/proj/pred/static/log/submitted_seq.log
+            infile1=/big/server/var/www/web_$method/proj/pred/static/log/all_submitted_seq.log
+            infile2=/big/server/var/www/web_$method/proj/pred/static/log/submitted_seq.log
             if [ -f $infile1 ]; then
                 infile=$infile1
             else

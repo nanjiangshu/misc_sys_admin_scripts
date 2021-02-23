@@ -17,9 +17,11 @@ Options:
   -end-date   STR   Set the end date for analysis
   -onlydata         Show only data, no comments
   -special-country  Show number of users for specified countries
+  -out-numuser-country FILE
+                    Output number of users per country
   -h, --help        Print this help message and exit
 
-Created 2017-05-03, updated 2020-07-11, Nanjiang Shu
+Created 2017-05-03, updated 2021-02-23, Nanjiang Shu
 "
 
 declare -A ratioEGI=( ["topcons2"]="0.5" ["scampi2"]="0.2" ["proq3"]="0.3" ["pconsc3"]="1.0" ["boctopus2"]="0.25" ["subcons"]="0.25" ["prodres"]="1.0" ) 
@@ -69,6 +71,12 @@ UsageAna(){  #{{{
                 printf " %15d" $numUserCountry
             done
             printf " %10d %10d %6s\n" $numJob $numSeq ${ratioEGI[$method]}
+
+            # output number of users (counted as unique IP) 
+            if [ "$outfile_numuser_country" != "" ]; then
+                awk -F"\t" '{print $2}' $anafile | sort | uniq -c | sort -nr | awk -v method=$method '{ss=$2; for (i=3; i<=NF; i++) {ss=ss" "$i}; printf("%s\t%s\t%s\n", method, ss, $1)}' >> $outfile_numuser_country
+
+            fi
             ;;
     esac
 } #}}}
@@ -84,6 +92,7 @@ enddate=22000000
 isShowOnlyData=0
 isAnaPerMonth=0
 specialCountryList=()
+outfile_numuser_country=
 
 tmpdir=$(mktemp -d /tmp/tmpdir.stat_usage_web_server.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
 
@@ -105,6 +114,7 @@ while [ "$1" != "" ]; do
             -onlydata|--onlydata) isShowOnlyData=1;;
             -permonth|--permonth) isAnaPerMonth=1;;
             -spc|--special-country) specialCountryList+=("$2");shift;;
+            -out-numuser-country) outfile_numuser_country=$2;shift;;
             -q|-quiet|--quiet) isQuiet=1;;
             -*) echo Error! Wrong argument: $1 >&2; exit;;
         esac
@@ -125,6 +135,10 @@ fi
 
 if [ $isShowOnlyData -eq 0 ];then
     echo -e "Web server usage statistics for the period $startdate to $enddate \n"
+fi
+
+if [ "$outfile_numuser_country" ! = "" ];then
+    cat /dev/null > $outfile_numuser_country
 fi
 
 if [ $isAnaPerMonth -eq 0 ];then

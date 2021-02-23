@@ -1,0 +1,34 @@
+<VirtualHost *:80>
+    ServerAdmin nanjiang.shu@scilifelab.se
+    ServerName 90.147.102.44 
+    WSGIScriptAlias / "/var/www/html/web_common_backend/proj/wsgi.py"
+
+    DocumentRoot "/var/www/html/web_common_backend/"
+    Alias /static/ "/var/www/html/web_common_backend/proj/pred/static/"
+
+    <Directory "/var/www/html/web_common_backend/proj">
+        <Files wsgi.py>
+        Options -Indexes +FollowSymLinks +MultiViews
+        Options +ExecCGI
+        Order allow,deny
+        Allow from all
+        </Files>
+    </Directory>
+
+
+    ScriptAlias /cgi-bin/ /var/www/html/web_common_backend/proj/cgi-bin/
+    <Directory "/var/www/html/web_common_backend/cgi-bin/">
+        AllowOverride None
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+    ErrorLog /var/log/apache2/web_common_backend-error.log
+
+    # Possible values include: debug, info, notice, warn, error, crit,
+    # alert, emerg.
+    LogLevel warn
+
+    CustomLog /var/log/apache2/web_common_backend-access.log combined
+</VirtualHost>

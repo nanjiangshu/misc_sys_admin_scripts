@@ -137,7 +137,7 @@ if [ $isShowOnlyData -eq 0 ];then
     echo -e "Web server usage statistics for the period $startdate to $enddate \n"
 fi
 
-if [ "$outfile_numuser_country" ! = "" ];then
+if [ "$outfile_numuser_country" != "" ];then
     cat /dev/null > $outfile_numuser_country
 fi
 

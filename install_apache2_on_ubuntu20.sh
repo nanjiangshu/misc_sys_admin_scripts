@@ -10,6 +10,10 @@ sudo apt -y install apache2
 sudo apt -y install apache2-dev
 sudo apt -y install libapache2-mod-wsgi-py3
 
+# install python tools
+sudo apt -y install python3-pip
+sudo pip3 install virtualenv
+
 # for set limitation for maximum connections
 tmpdir=$(mktemp -d /tmp/tmp.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
 trap 'rm -rf "$tmpdir"' INT TERM EXIT

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=3.5.0
+VERSION=3.5.3
 
 usage="
 USAGE: $0 <version>

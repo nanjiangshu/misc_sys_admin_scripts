@@ -7,6 +7,10 @@
 
 # sudo crontab -u apache_user -e  
 
+echo "======Clean web-server data on the frontend  ======"
+echo "Date=`date`"
+echo "==================================================="
+
 if [ -d /scratch ];then
 
     find /scratch -maxdepth 1 -name "seq_*" -type d   -ctime +10 -print0 | xargs -0  rm -rf

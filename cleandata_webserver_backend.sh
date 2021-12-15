@@ -6,6 +6,9 @@
 # this script is supposed to be added to the crontab as apache_user
 
 # sudo crontab -u apache_user -e  
+echo "======Clean web-server data on the backend  ======"
+echo "Date=`date`"
+echo "==================================================="
 
 if [ -d /scratch ];then
 

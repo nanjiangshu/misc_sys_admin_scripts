@@ -14,7 +14,7 @@ if [ -d /scratch ];then
 
 fi
 
-serverlist="common_backend"
+serverlist="common_backend web_common_backend"
 for server in $serverlist; do 
     if [ -d /var/www/html/$server/ ];then
         find /var/www/html/$server/proj/pred/static/tmp -maxdepth 1 -type d  -ctime +10 -name "tmp_*"  -print0 | xargs -I{} -0 sudo rm -rf 

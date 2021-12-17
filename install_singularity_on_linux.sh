@@ -27,11 +27,14 @@ sudo apt-get update && \
     pkg-config squashfs-tools cryptsetup \
     make gcc
 
-# install golang (at least version 1.13)
+currdir=$PWD
+cd $tmpdir
 
+# install golang (at least version 1.13)
 export GO_VERSION=1.13.3 OS=linux ARCH=amd64  # change this as you need
-wget -O /tmp/go${GO_VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${GO_VERSION}.${OS}-${ARCH}.tar.gz && \
-      sudo tar -C /usr/local -xzf /tmp/go${GO_VERSION}.${OS}-${ARCH}.tar.gz
+wget -O go${GO_VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${GO_VERSION}.${OS}-${ARCH}.tar.gz
+tar -xvzf /tmp/go${GO_VERSION}.${OS}-${ARCH}.tar.gz
+sudo rsync -arv go/ /usr/local/go/
 
 echo 'export GOPATH=${HOME}/go' >> ~/.bashrc
 echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
@@ -40,8 +43,6 @@ echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
 export GOPATH=${HOME}/go
 export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin
 
-currdir=$PWD
-cd $tmpdir
 wget https://github.com/singularityware/singularity/releases/download/v$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity

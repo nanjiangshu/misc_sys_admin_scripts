@@ -19,12 +19,22 @@ Options:
   -special-country  Show number of users for specified countries
   -out-numuser-country FILE
                     Output number of users per country
+  -out-numjob-country FILE
+                    Output number of jobs per country
   -h, --help        Print this help message and exit
 
-Created 2017-05-03, updated 2021-02-23, Nanjiang Shu
+Created 2017-05-03, updated 2022-01-13, Nanjiang Shu
 "
 
 declare -A ratioEGI=( ["topcons2"]="0.5" ["scampi2"]="0.2" ["proq3"]="0.3" ["pconsc3"]="1.0" ["boctopus2"]="0.25" ["subcons"]="0.25" ["prodres"]="1.0" ) 
+
+nodename=`uname -n`
+
+case $nodename in 
+    pcons*) webserver_base=/big/server/var/www;;
+    *) webserver_base=/data3/server;;
+esac
+
 
 UsageAna(){  #{{{
     local method=$1
@@ -34,12 +44,15 @@ UsageAna(){  #{{{
         topcons2|proq3|pconsc3|subcons|prodres|scampi2|boctopus2)
             #infile1=/var/www/html/$method/proj/pred/static/log/all_submitted_seq.log
             #infile2=/var/www/html/$method/proj/pred/static/log/submitted_seq.log
-            infile1=/big/server/var/www/web_$method/proj/pred/static/log/all_submitted_seq.log
-            infile2=/big/server/var/www/web_$method/proj/pred/static/log/submitted_seq.log
+            infile1=${webserver_base}/web_$method/proj/pred/static/log/all_submitted_seq.log
+            infile2=${webserver_base}/web_$method/proj/pred/static/log/submitted_seq.log
             if [ -f $infile1 ]; then
                 infile=$infile1
             else
                 infile=$infile2
+            fi
+            if [ $isDebug -eq 1 ]; then 
+                echo "Using input file $infile"
             fi
             uniqiplistfile=$tmpdir/uniqiplist.$method.txt
             anafile=$tmpdir/uniqidlist.$method.ana.txt
@@ -75,6 +88,15 @@ UsageAna(){  #{{{
             # output number of users (counted as unique IP) 
             if [ "$outfile_numuser_country" != "" ]; then
                 awk -F"\t" '{print $2}' $anafile | sort | uniq -c | sort -nr | awk -v method=$method '{ss=$2; for (i=3; i<=NF; i++) {ss=ss" "$i}; printf("%s\t%s\t%s\n", method, ss, $1)}' >> $outfile_numuser_country
+            fi
+
+            # output number of jobs per country
+            if [ "$outfile_numjob_country" != "" ];then
+                all_job_iplistfile=$tmpdir/all_job_iplist.$method.txt
+                all_job_countrylistfile=$tmpdir/all_job_countrylist.$method.txt
+                awk -F "\t" -v d1=$startdate -v d2=$enddate '{ip=$3; split($1,ss," "); date=ss[1]; gsub(/-/, "", date); if(date>=d1 && date<=d2) {print ip}}' $infile > $all_job_iplistfile
+                my_ip2country.py -l  $all_job_iplistfile -show-eu > $all_job_countrylistfile
+                awk -F"\t" '{print $2}' $all_job_countrylistfile | sort | uniq -c | sort -nr | awk -v method=$method '{ss=$2; for (i=3; i<=NF; i++) {ss=ss" "$i}; printf("%s\t%s\t%s\n", method, ss, $1)}' >> $outfile_numjob_country
 
             fi
             ;;
@@ -91,12 +113,14 @@ startdate=19000000
 enddate=22000000
 isShowOnlyData=0
 isAnaPerMonth=0
+isDebug=0
 specialCountryList=()
 outfile_numuser_country=
+outfile_numjob_country=
 
 tmpdir=$(mktemp -d /tmp/tmpdir.stat_usage_web_server.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
 
-trap 'rm -rf "$tmpdir"' INT TERM EXIT
+#trap 'rm -rf "$tmpdir"' INT TERM EXIT
 
 
 isNonOptionArg=0
@@ -115,7 +139,9 @@ while [ "$1" != "" ]; do
             -permonth|--permonth) isAnaPerMonth=1;;
             -spc|--special-country) specialCountryList+=("$2");shift;;
             -out-numuser-country) outfile_numuser_country=$2;shift;;
+            -out-numjob-country) outfile_numjob_country=$2;shift;;
             -q|-quiet|--quiet) isQuiet=1;;
+            -debug|--debug) isDebug=1;;
             -*) echo Error! Wrong argument: $1 >&2; exit;;
         esac
     else
@@ -139,6 +165,9 @@ fi
 
 if [ "$outfile_numuser_country" != "" ];then
     cat /dev/null > $outfile_numuser_country
+fi
+if [ "$outfile_numjob_country" != "" ];then
+    cat /dev/null > $outfile_numjob_country
 fi
 
 if [ $isAnaPerMonth -eq 0 ];then
@@ -168,4 +197,10 @@ PercentEU   Percentage of users that are from the European countries out of the 
 NumJob      Number of jobs submitted to the server
 NumSeq      Number of sequences (queries) submitted to the server, one job can have multiple sequences.
 """
+fi
+
+if [ $isDebug -eq 0 ]; then
+    rm -rf $tmpdir
+else
+    echo "Temporary files are kept at $tmpdir"
 fi

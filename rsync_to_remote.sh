@@ -39,6 +39,7 @@ RsyncToRemote() {
             remote_path=$remote_path/
         fi
     fi
+    RunCmd "ssh -o StrictHostKeyChecking=no $host_with_user mkdir -p $remote_path"
     RunCmd "rsync -auvz -e \"ssh -o StrictHostKeyChecking=no\" $local_path $host_with_user:$remote_path"
 }
 

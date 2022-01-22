@@ -63,7 +63,7 @@ while [ "$1" != "" ]; do
     elif [ "${1:0:1}" == "-" ]; then
         case "$1" in
             -h|--help) echo "$usage"; exit;;
-            -u|--user) user=$2;shift;;
+            -u|--user) g_user=$2;shift;;
             -l|--list) hostListFile=$2;shift;;
             -local|--local) local_path=$2;shift;;
             -remote|--remote) remote_path=$2;shift;;

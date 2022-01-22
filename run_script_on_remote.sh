@@ -53,7 +53,7 @@ while [ "$1" != "" ]; do
     elif [ "${1:0:1}" == "-" ]; then
         case "$1" in
             -h|--help) echo "$usage"; exit;;
-            -u|--user) user=$2;shift;;
+            -u|--user) g_user=$2;shift;;
             -l|--list) hostListFile=$2;shift;;
             -s|--script) scriptfile=$2;shift;;
             -q|--quiet) isQuiet=1;;

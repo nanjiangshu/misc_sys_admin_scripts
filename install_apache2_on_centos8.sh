@@ -15,3 +15,6 @@ sudo firewall-cmd --reload
 sudo systemctl start httpd
 sudo systemctl enable httpd
 sudo systemctl status httpd
+
+# others 
+sudo yum install wget tar make -y

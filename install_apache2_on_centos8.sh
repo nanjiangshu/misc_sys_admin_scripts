@@ -4,7 +4,7 @@ sudo yum clean all
 
 sudo yum -y update
 
-sudo yum -y install httpd
+sudo yum -y install httpd httpd-devel
 
 sudo yum install firewall-config
 

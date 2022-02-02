@@ -17,4 +17,4 @@ sudo systemctl enable httpd
 sudo systemctl status httpd
 
 # others 
-sudo yum install wget tar make -y
+sudo yum install wget tar make gcc -y

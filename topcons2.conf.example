@@ -1,0 +1,43 @@
+<VirtualHost *:80>
+
+    ServerAdmin nanjiang.shu@scilifelab.se
+    ServerName  dev.topcons.bioshu.se
+    ServerAlias dev.v2.topcons.bioshu.se
+    ServerAlias dev.topcons.net
+    WSGIScriptAlias / "/var/www/html/topcons2/proj/wsgi.py"
+# add the following line to avoid endless loops for spyne
+# this is caused by incompatibility between Django and lxml
+# in this case, running multiple mod_wsgi on the same machine might have
+# problem
+    #WSGIApplicationGroup %{GLOBAL}
+
+    DocumentRoot "/var/www/html/topcons2/"
+    Alias /static/ "/var/www/html/topcons2/proj/pred/static/"
+
+    <Directory "/var/www/html/topcons2/proj">
+        <Files wsgi.py>
+        Options -Indexes +FollowSymLinks +MultiViews
+        Options +ExecCGI
+        Order allow,deny
+        Allow from all
+        </Files>
+    </Directory>
+
+
+    ScriptAlias /cgi-bin/ /var/www/html/topcons2/proj/cgi-bin/
+    <Directory "/var/www/html/topcons2/cgi-bin/">
+        AllowOverride None
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+    ErrorLog /var/log/apache2/topcons2-error.log
+
+    # Possible values include: debug, info, notice, warn, error, crit,
+    # alert, emerg.
+    LogLevel warn
+
+    CustomLog /var/log/apache2/topcons2-access.log combined
+</VirtualHost>
+

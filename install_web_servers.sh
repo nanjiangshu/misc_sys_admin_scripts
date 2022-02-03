@@ -45,17 +45,34 @@ tmpdir=$(mktemp -d /tmp/tmpdir.install_web_servers.XXXXXXXXX) || { echo "Failed 
 InstallWebServer(){
     local method="$1"
     local reponame="predictprotein-webserver-${method}"
-    git_url="${url_base}/${reponame}"
+    local git_url="${url_base}/${reponame}"
+
+    local servername=
+    case $method in
+        boctopus2) servername=dev.boctopus.bioshu.se;;
+        scampi2) servername=dev.scampi.bioshu.se;;
+        *) servername=dev.${method}.bioshu.se;;
+    esac
+
     pushd $webserver_base
     if [ ! -d $reponame ];then
         git clone "$git_url"
-        cd $reponame
-        bash setup_virtualenv.sh
-        bash init.sh
     else
-        echo "${webserver_base}/${reponame} exists. Ingore!"
+        echo "${webserver_base}/${reponame} exists."
     fi
+    cd $reponame
+    git pull --all --prune
+    if [ ! -d env ] ;then 
+        bash setup_virtualenv.sh
+    fi
+    source env/bin/activate
+    bash init.sh
+    deactivate
+    cd proj
+    echo $servername >> allowed_host_dev.txt
+    ln -sf dev_settings.py settings.py
     popd
+
 
     # creating symlink to the web server code base
     pushd /var/www/html
@@ -73,12 +90,6 @@ InstallWebServer(){
     fi
     local conffile=/etc/httpd/conf.d/${method}.conf
     if [ ! -f $conffile ] ;then
-        local servername=
-        case $method in
-            boctopus2) servername=dev.boctopus.bioshu.se;;
-            scampi2) servername=dev.scampi.bioshu.se;;
-            *) servername=dev.${method}.bioshu.se;;
-        esac
         sed "s/topcons2/${method}/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername}/g" | sudo tee $conffile 1> /dev/null
     fi
 }

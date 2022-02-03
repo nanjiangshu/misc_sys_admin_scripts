@@ -18,3 +18,4 @@ sudo systemctl status httpd
 
 # others 
 sudo yum install wget tar make gcc -y
+sudo yum install -y libgcrypt-devel

@@ -47,7 +47,7 @@ InstallWebServer(){
     local reponame="predictprotein-webserver-${method}"
     git_url="${url_base}/${reponame}"
     pushd $webserver_base
-    if [ -d $reponame ];then
+    if [ ! -d $reponame ];then
         git clone "$git_url"
         cd $reponame
         bash setup_virtualenv.sh
@@ -74,12 +74,12 @@ InstallWebServer(){
     local conffile=/etc/httpd/conf.d/${method}.conf
     if [ ! -f $conffile ] ;then
         local servername=
-        case $method in 
+        case $method in
             boctopus2) servername=dev.boctopus.bioshu.se;;
             scampi2) servername=dev.scampi.bioshu.se;;
             *) servername=dev.${method}.bioshu.se;;
-        esac 
-        sed "s/topcons2/$method/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername} g" | sudo tee $conffile 1> /dev/null
+        esac
+        sed "s/topcons2/${method}/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername}/g" | sudo tee $conffile 1> /dev/null
     fi
 }
 

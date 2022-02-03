@@ -23,7 +23,7 @@ nodename=`uname -n`
 
 case $nodename in 
     pcons*) webserver_base=/big/server/var/www;;
-    dev-web*) webserver_base=/software/server
+    dev-web*) webserver_base=/software/server;;
     *) webserver_base=/data3/server;;
 esac
 

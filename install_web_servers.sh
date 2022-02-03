@@ -89,7 +89,7 @@ InstallWebServer(){
         exampleconf=$rundir/topcons2.httpd.conf.example
     fi
     local conffile=/etc/httpd/conf.d/${method}.conf
-    if [ ! -f $conffile ] ;then
+    if [ ! -s $conffile ] ;then
         sed "s/topcons2/${method}/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername}/g" | sudo tee $conffile 1> /dev/null
     fi
 }

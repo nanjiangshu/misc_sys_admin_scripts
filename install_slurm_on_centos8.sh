@@ -47,9 +47,10 @@ sudo yum --nogpgcheck localinstall *.rpm
 
 mkdir -p /var/spool/slurmctld
 mkdir -p /var/spool/slurmd
-chown slurm: /var/spool/slurm
+mkdir -p /var/spool/slurm
 chown slurm: /var/spool/slurmctld
 chown slurm: /var/spool/slurmd
+chown slurm: /var/spool/slurm
 
 chmod 755 /var/spool/slurmctld
 touch /var/log/slurmctld.log
@@ -62,7 +63,7 @@ touch /var/log/slurmd.log
 chown slurm: /var/log/slurmd.log
 
 # copy slurm files
-cat $rundir/slurm.conf.centos.example | sed "s/pcons1.scilifelab.se/$hostname/g" | tee /etc/slurm/slurm.conf
+cat $rundir/slurm.conf.centos8.example | sed "s/pcons1.scilifelab.se/$hostname/g" | tee /etc/slurm/slurm.conf
 cat $rundir/cgroup.conf.centos8.example | tee /etc/slurm/cgroup.conf
 
 # start the service
@@ -72,6 +73,8 @@ systemctl start slurmd.service
 
 systemctl enable slurmctld.service
 systemctl start slurmctld.service
+
+bash $rundir/reload_slurm.sh
 
 rm -rf $tmpdir
 

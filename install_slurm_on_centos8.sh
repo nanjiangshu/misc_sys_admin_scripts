@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# not verified 
 rundir=`dirname $0`
 rundir=`readlink -f $rundir`
 
@@ -37,11 +37,13 @@ tmpdir=$(mktemp -d /tmp/tmpdir.install_slurm_on_centos8.XXXXXXXXX) || { echo "Fa
 cd $tmpdir
 
 wget https://download.schedmd.com/slurm/slurm-20.02.7.tar.bz2
+yum install rpm-build -y
 rpmbuild -ta slurm-20.02.7.tar.bz2
 cd ~/rpmbuild/RPMS/x86_64/
 sudo yum --nogpgcheck localinstall *.rpm
 
 # fix file permissions
+
 
 mkdir -p /var/spool/slurmctld
 mkdir -p /var/spool/slurmd

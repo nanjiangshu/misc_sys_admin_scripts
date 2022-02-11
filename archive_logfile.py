@@ -1,185 +1,127 @@
 #!/usr/bin/python3
-# Filename: archive_logfile.py
-# Description: archive logfile using gnu gzip
+# -*- coding: utf-8 -*-
+"""
+Filename: archive_logfile.py
+Description: archive logfile using gnu gzip
+"""
 import os
 import sys
 import re
 import gzip
-progname =  os.path.basename(sys.argv[0])
-wspace = ''.join([" "]*len(progname))
+import argparse
 
-usage_short="""
-Usage: %s FILE [FILE ...] [-maxsize STR]
-"""%(progname)
-
-usage_ext="""
-Description:
-    Archive (gzip) the logfile if its size is over maxsize
-
-OPTIONS:
-  -l LISTFILE   List of log files
-  -maxsize STR  Set the threshold of the filesize, the logfile will be gzipped
-                if its file size is >= maxsize, (default: 20M)
-                e.g. 500k, 20M, 500000b, 5000, 1G
-  -h, --help    Print this help message and exit
-
-Created 2014-05-22, updated 2014-05-22, Nanjiang Shu
-"""
-usage_exp="""
-Examples:
-    %s /var/log/program.output.log
-"""%(progname)
-
-def PrintHelp(fpout=sys.stdout):#{{{
-    print(usage_short, file=fpout)
-    print(usage_ext, file=fpout)
-    print(usage_exp, file=fpout)#}}}
-def my_getopt_str(argv, i):#{{{
-    """
-    Get a string from the argument list, return the string and the updated
-    index to the argument list
-    """
-    try:
-        opt = argv[i+1]
-        if opt[0] == "-":
-            msg = "Error! option '%s' must be followed by a string"\
-                    ", not an option arg."
-            print(msg%(argv[i]), file=sys.stderr)
-            sys.exit(1)
-        return (opt, i+2)
-    except IndexError:
-        msg = "Error! option '%s' must be followed by a string"
-        print(msg%(argv[i]), file=sys.stderr)
-        raise
-#}}}
-def Size_human2byte(s):#{{{
-    if s.isdigit():
-        return int(s)
+def size_human2byte(s_str):#{{{
+    """Convert human readable size into bytes in integer"""
+    s_byte = None
+    if s_str.isdigit():
+        s_byte = int(s_str)
     else:
-        s = s.upper()
-        match = re.match(r"([0-9]+)([A-Z]+)", s , re.I)
+        s_str = s_str.upper()
+        match = re.match(r"([0-9]+)([A-Z]+)", s_str, re.I)
         if match:
             items = match.groups()
             size = int(items[0])
             if items[1] in ["B"]:
-                return size
+                s_byte = size
             elif items[1] in ["K", "KB"]:
-                return size*1024
+                s_byte = size*1024
             elif items[1] in ["M", "MB"]:
-                return size*1024*1024
+                s_byte = size*1024*1024
             elif items[1] in ["G", "GB"]:
-                return size*1024*1024*1024
+                s_byte = size*1024*1024*1024
             else:
-                print("Bad maxsize argument:",s, file=sys.stderr)
+                print("Bad maxsize argument:", s_str, file=sys.stderr)
                 return -1
         else:
-            print("Bad maxsize argument:",s, file=sys.stderr)
+            print("Bad maxsize argument:", s_str, file=sys.stderr)
             return -1
+    return s_byte
 
 #}}}
-def ArchiveFile(filename, maxsize):#{{{
+def archive_file(filename, maxsize):#{{{
     """
     Archive the logfile if its size exceeds the limit
     """
     if not os.path.exists(filename):
-        print(filename,  "does not exist. ignore.", file=sys.stderr)
+        print(filename, "does not exist. ignore.", file=sys.stderr)
         return 1
-    else:
-        filesize = os.path.getsize(filename)
-        if filesize > maxsize:
-            cnt = 0
-            zipfile = ""
-            while 1:
-                cnt += 1
-                zipfile = "%s.%d.gz"%(filename, cnt)
-                if not os.path.exists(zipfile):
-                    break
-            # write zip file
-            try:
-                f_in = open(filename, 'rb')
-            except IOError:
-                print("Failed to read %s"%(filename), file=sys.stderr)
-                return 1
-            try:
-                f_out = gzip.open(zipfile, 'wb')
-            except IOError:
-                print("Failed to write to %s"%(zipfile), file=sys.stderr)
-                return 1
 
-            f_out.writelines(f_in)
-            f_out.close()
-            f_in.close()
-            print("%s is archived to %s"%(filename, zipfile))
-            os.remove(filename)
-        return 0
+    filesize = os.path.getsize(filename)
+    if filesize > maxsize:
+        cnt = 0
+        zipfile = ""
+        while 1:
+            cnt += 1
+            zipfile = "%s.%d.gz"%(filename, cnt)
+            if not os.path.exists(zipfile):
+                break
+        # write zip file
+        try:
+            f_in = open(filename, 'rb')
+        except IOError:
+            print("Failed to read %s"%(filename), file=sys.stderr)
+            return 1
+        try:
+            f_out = gzip.open(zipfile, 'wb')
+        except IOError:
+            print("Failed to write to %s"%(zipfile), file=sys.stderr)
+            return 1
+
+        f_out.writelines(f_in)
+        f_out.close()
+        f_in.close()
+        print("%s is archived to %s"%(filename, zipfile))
+        os.remove(filename)
+    return 0
 #}}}
 def main(g_params):#{{{
-    argv = sys.argv
-    numArgv = len(argv)
-    if numArgv < 2:
-        PrintHelp()
-        return 1
+    """main procedure"""
+    parser = argparse.ArgumentParser(
+        description='Archive (gzip) the logfile if its size is over the threshold',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''\
+Created 2014-05-22, updated 2022-02-11, Nanjiang Shu
+''')
+    parser.add_argument('file_list', metavar='FILE', nargs='*',
+                        help='supply one or more files')
+    parser.add_argument('-l', metavar='LISTFILE', dest='file_list_file',
+                        help='provide a file with a list of filenames')
+    parser.add_argument('-maxsize', metavar='SIZE', dest='max_size',
+                        help='Set the threshold of the filesize (default: 20Mb),\
+                                e.g. 500k, 20M, 500000b, 5000, 1G')
 
-    fileList = []
-    fileListFile = ""
-    maxsize_str = ""
+    args = parser.parse_args()
 
-    i = 1
-    isNonOptionArg=False
-    while i < numArgv:
-        if isNonOptionArg == True:
-            fileList.append(argv[i])
-            isNonOptionArg = False
-            i += 1
-        elif argv[i] == "--":
-            isNonOptionArg = True
-            i += 1
-        elif argv[i][0] == "-":
-            if argv[i] in ["-h", "--help"]:
-                PrintHelp()
-                return 1
-            elif argv[i] in ["-maxsize", "--maxsize"]:
-                (maxsize_str, i) = my_getopt_str(argv, i)
-            elif argv[i] in ["-l", "--l"] :
-                (fileListFile, i) = my_getopt_str(argv, i)
-            elif argv[i] in ["-q", "--q"]:
-                g_params['isQuiet'] = True
-                i += 1
-            else:
-                print("Error! Wrong argument:", argv[i], file=sys.stderr)
-                return 1
-        else:
-            fileList.append(argv[i])
-            i += 1
+    file_list = args.file_list
+    file_list_file = args.file_list_file
+    maxsize_str = args.max_size
 
-
-    if maxsize_str != "":
-        maxsize = Size_human2byte(maxsize_str)
+    if not maxsize_str is None:
+        maxsize = size_human2byte(maxsize_str)
         if maxsize > 0:
             g_params['maxsize'] = maxsize
         else:
             return 1
-#     print "maxsize=", g_params['maxsize']
 
-    if fileListFile != "":
-        tmplist = open(fileListFile, "r").read().split('\n')
+    if not file_list_file is None:
+        tmplist = open(file_list_file, "r").read().split('\n')
         tmplist = [x.strip() for x in tmplist]
-        fileList += tmplist
+        file_list += tmplist
 
-    if len(fileList) < 1:
+    if not file_list:
         print("No input file is set. exit.", file=sys.stderr)
-    for i in range(len(fileList)):
-#         print "%d --> %s" %(i, fileList[i])
-        ArchiveFile(fileList[i], g_params['maxsize'])
-#}}}
+    for fname in file_list:
+        archive_file(fname, g_params['maxsize'])
 
+    return 0
+# }}}
 
-def InitGlobalParameter():#{{{
+def init_global_param():#{{{
+    """Init global parameters"""
     g_params = {}
     g_params['isQuiet'] = True
     g_params['maxsize'] = 20*1024*1024
     return g_params
 #}}}
-if __name__ == '__main__' :
-    g_params = InitGlobalParameter()
-    sys.exit(main(g_params))
+if __name__ == '__main__':
+    sys.exit(main(init_global_param()))

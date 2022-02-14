@@ -19,3 +19,4 @@ sudo systemctl status httpd
 # others 
 sudo yum install wget tar make gcc bzip2 -y
 sudo yum install -y libgcrypt-devel
+sudo dnf -y install git-lfs

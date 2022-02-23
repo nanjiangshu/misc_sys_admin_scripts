@@ -8,7 +8,7 @@ progname=`basename $0`
 size_progname=${#progname}
 wspace=`printf "%*s" $size_progname ""`
 usage="
-Usage:  $progname -script FILE host [host ...]
+Usage:  $progname --script FILE host [host ...]
 Options:
   -u, --user   USER   Set the username
   -l, --list   FILE   Set the file contains a list of hosts
@@ -55,7 +55,7 @@ while [ "$1" != "" ]; do
             -h|--help) echo "$usage"; exit;;
             -u|--user) g_user=$2;shift;;
             -l|--list) hostListFile=$2;shift;;
-            -s|--script) scriptfile=$2;shift;;
+            -s|-script|--script) scriptfile=$2;shift;;
             -q|--quiet) isQuiet=1;;
             -sudo|--sudo) sudo=sudo;;
             -*) echo "Error! Wrong argument: $1">&2; exit;;

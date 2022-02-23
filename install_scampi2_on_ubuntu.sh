@@ -5,7 +5,7 @@ rundir=`dirname $0`
 cd ~/software/misc_sys_admin_scripts
 git pull --all
 
-bash $rundir/install_dep_scampi2_on_ubuntu.sh
+bash ./install_dep_scampi2_on_ubuntu.sh
 
 # install the scampi2 package
 mkdir -p /media/storage/software

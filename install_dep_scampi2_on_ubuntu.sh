@@ -26,7 +26,8 @@ sudo apt-get -y  install tree
 #installing perl modules
 # using cpanm to install 
 sudo apt-get install -y perlbrew 
-perlbrew install-cpanm 
+perlbrew -f install-cpanm 
+export PATH=$PATH:$HOME/perl5/perlbrew/bin
 cpanm IPC::Run
 cpanm Moose
 cpanm Bio::Perl

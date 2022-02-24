@@ -27,10 +27,10 @@ sudo apt-get -y  install tree
 # using cpanm to install 
 sudo apt-get install -y perlbrew 
 perlbrew -f install-cpanm 
-export PATH=$PATH:$HOME/perl5/perlbrew/bin
-cpanm IPC::Run
-cpanm Moose
-cpanm Bio::Perl
+cpanm=$HOME/perl5/perlbrew/bin/cpanm
+sudo $cpanm IPC::Run
+sudo $cpanm Moose
+# cpanm Bio::Perl
 
 # solving pip install lxml problem
 sudo apt-get -y  install libxslt 

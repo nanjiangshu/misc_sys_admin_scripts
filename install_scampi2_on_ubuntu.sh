@@ -19,10 +19,10 @@ git pull
 popd
 
 pushd /var/www/html/web_common_backend/proj/pred/app/soft
-if [ ! -l scampi2 ];then
+if [ ! -L scampi2 ];then
     ln -s /media/storage/software/scampi2 .
 fi
-if [ ! -l blastdb ] ;then
+if [ ! -L blastdb ] ;then
     ln -s /media/storage/data/blastdb .
 fi
 popd

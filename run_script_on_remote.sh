@@ -13,6 +13,7 @@ Options:
   -u, --user   USER   Set the username
   -l, --list   FILE   Set the file contains a list of hosts
   -s, --script FILE   Set the script file
+  -c, --command STR   Set the command to be run
   -sudo               Wether run as sudo
   -h, --help          Print this help message and exit
 
@@ -32,11 +33,25 @@ RunScriptOnRemote() {
     fi
     cat $scriptfile | ssh -o StrictHostKeyChecking=no $host_with_user $sudo bash
 }
+RunCmdOnRemote() {
+    local host=$1
+    local host_with_user=
+    case $host in
+        *@*) host_with_user=$host ;;
+        *) host_with_user=${g_user}@${host};;
+    esac
+
+    if [ $isQuiet -eq 0 ] ;then
+        echo "Running '$cmdline' on $host_with_user"
+    fi
+    ssh -o StrictHostKeyChecking=no $host_with_user $sudo $cmdline
+}
 
 hostListFile=
 hostList=()
 isQuiet=0
 sudo=
+cmdline=
 
 if [ $# -lt 1 ]; then
     echo "$usage"
@@ -56,6 +71,7 @@ while [ "$1" != "" ]; do
             -u|--user) g_user=$2;shift;;
             -l|--list) hostListFile=$2;shift;;
             -s|-script|--script) scriptfile=$2;shift;;
+            -c|--c|--command) cmdline="$2";shift;;
             -q|--quiet) isQuiet=1;;
             -sudo|--sudo) sudo=sudo;;
             -*) echo "Error! Wrong argument: $1">&2; exit;;
@@ -84,7 +100,20 @@ if [ $numHost -eq 0  ]; then
     exit 1
 fi
 
-for ((i=0;i<numHost;i++));do
-    host=${hostList[$i]}
-    RunScriptOnRemote "$host"
-done
+if [ -s "$scriptfile" ]
+then
+    for ((i=0;i<numHost;i++))
+    do
+        host=${hostList[$i]}
+        RunScriptOnRemote "$host"
+    done
+fi
+
+if [ "$cmdline" != "" ]
+then
+    for ((i=0;i<numHost;i++))
+    do
+        host=${hostList[$i]}
+        RunCmdOnRemote "$host"
+    done
+fi

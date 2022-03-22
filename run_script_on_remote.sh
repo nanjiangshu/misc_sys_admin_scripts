@@ -2,7 +2,6 @@
 
 # Description: Run local script on the remote server via ssh
 
-set -e
 g_user=ubuntu
 progname=`basename $0`
 size_progname=${#progname}

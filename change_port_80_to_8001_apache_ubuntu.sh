@@ -4,7 +4,7 @@
 # for Ubuntu and Debian system
 
 
-sudo sed -i 's/^Listen 80$/Listen 8001/g' ports.conf
-sudo sed -i 's/^<VirtualHost \*:80>$/<VirtualHost \*:8001>/g' /etc/apache2/sites-available/000-default.conf
-sudo sed -i 's/^<VirtualHost \*:80>$/<VirtualHost \*:8001>/g' /etc/apache2/conf-available/web_common_backend.conf
-sudo service restart apache2
+sed -i 's/^Listen 80$/Listen 8001/g' /etc/apache2/ports.conf
+sed -i 's/^<VirtualHost \*:80>$/<VirtualHost \*:8001>/g' /etc/apache2/sites-available/000-default.conf
+sed -i 's/^<VirtualHost \*:80>$/<VirtualHost \*:8001>/g' /etc/apache2/conf-available/web_common_backend.conf
+service restart apache2

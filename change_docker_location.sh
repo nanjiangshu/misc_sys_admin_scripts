@@ -19,12 +19,16 @@ new_docker_path=$1
 sudo systemctl stop docker.service
 sudo systemctl stop docker.socket
 
+if [ ! -d "$new_docker_path" ];then
+    sudo mkdir -p "$new_docker_path"
+fi
 
-sudo mkdir -p $new_docker_path
+if [ ! -s /etc/docker/daemon.json ];then
+    echo "{}" | sudo tee /etc/docker/daemon.json
+fi
+cat /etc/docker/daemon.json | jq ". + {\"data-root\": \"$new_docker_path\"}" | sudo tee /etc/docker/daemon.json
 
-sudo sed -i 's,ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock,ExecStart=/usr/bin/dockerd -g '"$new_docker_path"' -H fd:// --containerd=/run/containerd/containerd.sock,' /lib/systemd/system/docker.service
-
-sudo rsync -aqxP /var/lib/docker/ $new_docker_path/
+sudo rsync -aqxP /var/lib/docker/ "$new_docker_path"/
 
 sudo systemctl daemon-reload
 sudo systemctl start docker

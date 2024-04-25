@@ -2,5 +2,6 @@
 
 bash ./install_docker_ubuntu.sh
 bash ./install_go_on_linux.sh 1.22.2
+bash ./install_et_ubuntu.sh
 
 

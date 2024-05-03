@@ -1,13 +1,17 @@
 #!/bin/bash
 
-VERSION=3.5.3
+#Note: singularity has been renamed to apptainer and 3.8.7 is the last version of singularity
+
+source ./utils.sh
+
+VERSION=3.8.7
 
 usage="
 USAGE: $0 <version>
 
 Default version is $VERSION
 
-Created 2017-10-27, updated 2017-10-27, Nanjiang Shu
+Created 2017-10-27, updated 2024-05-03, Nanjiang Shu
 "
 
 if [ "$1" != "" ];then
@@ -30,22 +34,29 @@ sudo apt-get update && \
 currdir=$PWD
 cd $tmpdir
 
-# install golang (at least version 1.13)
-export GO_VERSION=1.13.3 OS=linux ARCH=amd64  # change this as you need
-wget -O go${GO_VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${GO_VERSION}.${OS}-${ARCH}.tar.gz
-tar -xvzf go${GO_VERSION}.${OS}-${ARCH}.tar.gz
-sudo rsync -arv go/ /usr/local/go/
+isInstallGo=false
+go_version=$(go version | awk '{print $3}' |  sed 's/go//');
+if [ "$go_version" != "" ];then
+    cmp=$(compare_version "$go_version" "1.13")
+    if [ "$cmp" == "less" ]; then
+        echo "The installed golang version is less than 1.13. Please install golang version 1.13 or higher"
+        isInstallGo=true
+    fi
+else
+    echo "golang is not installed. Please install golang version 1.13 or higher"
+    isInstallGo=true
+fi
 
-echo 'export GOPATH=${HOME}/go' >> ~/.bashrc
-echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
+if [ "$isInstallGo" == "true" ]; then
+    # install golang (at least version 1.13)
+    bash ./install_go_on_linux.sh 1.22.2
+fi
 
-#. ~/.bashrc
 export GOPATH=${HOME}/go
 export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin
-
 wget https://github.com/singularityware/singularity/releases/download/v$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
-cd singularity
+cd singularity-$VERSION
 ./mconfig
 cd builddir
 make

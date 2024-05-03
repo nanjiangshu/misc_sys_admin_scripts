@@ -1,13 +1,13 @@
 #!/bin/bash
 
-VERSION=1.19.4
+VERSION=1.22.2
 
 usage="
 USAGE: $0 <version>
 
 Default version is $VERSION
 
-Created 2023-01-20, updated 2023-01-20, Nanjiang Shu
+Created 2023-01-20, updated 2024-05-03, Nanjiang Shu
 "
 
 if [ "$1" != "" ];then
@@ -18,8 +18,7 @@ tmpdir=$(mktemp -d /tmp/tmpdir.install_go_on_linux.XXXXXXXXX) || { echo "Failed 
 
 trap 'rm -rf "$tmpdir"' INT TERM EXIT
 
-
-sudo ls
+sudo ls > /dev/null
 
 # install dependencies
 sudo apt-get update && \
@@ -35,6 +34,10 @@ pushd $tmpdir
 export GO_VERSION=$VERSION OS=linux ARCH=amd64  # change this as you need
 wget -O go${GO_VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${GO_VERSION}.${OS}-${ARCH}.tar.gz
 tar -xvzf go${GO_VERSION}.${OS}-${ARCH}.tar.gz
+
+if [ -d /usr/local/go ] ;then
+    sudo rm -rf /usr/local/go
+fi
 sudo rsync -arv go/ /usr/local/go/
 
 echo 'export GOPATH=${HOME}/go' >> ~/.bashrc

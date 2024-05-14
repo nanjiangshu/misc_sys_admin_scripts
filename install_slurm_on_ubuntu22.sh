@@ -3,7 +3,7 @@
 rundir=`dirname $0`
 rundir=`readlink -f $rundir`
 
-hostname=$(hostanme)
+hostname=$(hostname -s)
 
 sudo apt install munge slurm-wlm  -y 
 

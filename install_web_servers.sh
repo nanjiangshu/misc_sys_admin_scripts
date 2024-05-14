@@ -105,13 +105,13 @@ InstallWebServer(){
         if [ -d /etc/httpd ];then
             exampleconf=${rundir}/topcons2.httpd.conf.example
         fi
-        conffile=/etc/httpd/conf.available/${method}.conf
+        conffile=/etc/httpd/conf-available/${method}.conf
         if [ ! -s $conffile ] ;then
             sed "s/topcons2/${method}/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername}/g" | sudo tee $conffile 1> /dev/null
         fi
     else # if [ "$isBackend" -eq 1 ];then
         exampleconf=${rundir}/web_common_backend.conf.example 
-        conffile=/etc/apache2/conf.available/${method}.conf
+        conffile=/etc/apache2/conf-available/${method}.conf
         if [ ! -s $conffile ] ;then
             sed "s/90.147.102.44/${servername}/g" | sudo tee $conffile 1> /dev/null
         fi

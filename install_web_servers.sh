@@ -100,17 +100,17 @@ InstallWebServer(){
     popd
 
     # creating config files
-    local exampleconf=${rundir}/topcons2.apache2.conf.example
-    if [ -d /etc/httpd ];then
-        exampleconf=${rundir}/topcons2.httpd.conf.example
-    fi
-    local conffile=/etc/httpd/conf.d/${method}.conf
-    if [ ! -s $conffile ] ;then
-        sed "s/topcons2/${method}/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername}/g" | sudo tee $conffile 1> /dev/null
-    fi
-
-    if [ "$isBackend" -eq 1 ];then
-        local exampleconf=${rundir}/web_common_backend.conf.example 
+    if [ "$isBackend" -eq 0 ];then
+        exampleconf=${rundir}/topcons2.apache2.conf.example
+        if [ -d /etc/httpd ];then
+            exampleconf=${rundir}/topcons2.httpd.conf.example
+        fi
+        conffile=/etc/httpd/conf.d/${method}.conf
+        if [ ! -s $conffile ] ;then
+            sed "s/topcons2/${method}/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername}/g" | sudo tee $conffile 1> /dev/null
+        fi
+    else # if [ "$isBackend" -eq 1 ];then
+        exampleconf=${rundir}/web_common_backend.conf.example 
         conffile=/etc/apache2/conf.d/${method}.conf
         if [ ! -s $conffile ] ;then
             sed "s/90.147.102.44/${servername}/g" | sudo tee $conffile 1> /dev/null

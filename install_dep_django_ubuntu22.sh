@@ -5,6 +5,8 @@ sudo apt -y install python-dev
 # installing mod_wsgi
 sudo apt -y install apache2-dev
 sudo apt -y install httpd-wsgi 
+sudo apt-get install libapache2-mod-wsgi-py3
+sudo a2enmod wsgi
 
 
 # for set limitation for maximum connections
@@ -19,3 +21,4 @@ cd
 sudo rm -rf $tmpdir
 
 
+sudo systemctl restart apache2

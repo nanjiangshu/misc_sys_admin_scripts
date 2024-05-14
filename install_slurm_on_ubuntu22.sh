@@ -8,7 +8,7 @@ hostname=$(hostanme)
 sudo apt install munge slurm-wlm  -y 
 
 # copy slurm files
-cat $rundir/slurm.conf.ubuntu22.example | sed "s/wks-nj/$hostname/g" | tee /etc/slurm/slurm.conf
+cat $rundir/slurm.conf.ubuntu22.example | sed "s/wks-nj/$hostname/g" | sudo tee /etc/slurm/slurm.conf
 
 # start the service
 

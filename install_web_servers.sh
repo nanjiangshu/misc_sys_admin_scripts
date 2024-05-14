@@ -116,6 +116,9 @@ InstallWebServer(){
             sed "s/90.147.102.44/${servername}/g" | sudo tee $conffile 1> /dev/null
         fi
     fi  
+
+    sudo a2ensite $method
+    sudo systemctl reload apache2 
 }
 
 

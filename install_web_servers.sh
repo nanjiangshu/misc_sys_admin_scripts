@@ -11,8 +11,9 @@ progname=`basename $0`
 size_progname=${#progname}
 wspace=`printf "%*s" $size_progname ""`
 usage="
-Usage:  $progname method [method ...]
+Usage:  $progname [-w webserver-base-dir] method [method ...]
 Options:
+  -w <dir>          Set the base directory of the web server code base.
   -h, --help        Print this help message and exit
 
 Created 2022-02-03, updated 2022-02-03, Nanjiang Shu
@@ -41,18 +42,33 @@ url_base="https://github.com/NBISweden"
 tmpdir=$(mktemp -d /tmp/tmpdir.install_web_servers.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
 
 #trap 'rm -rf "$tmpdir"' INT TERM EXIT
+ipaddress=$(curl ifconfig.me)
 
 InstallWebServer(){
     local method="$1"
-    local reponame="predictprotein-webserver-${method}"
+
+    local repo_method_name=
+    local servername=
+    local isBackend=0
+
+    case $method in
+        *web_common_backend*) 
+        isBackend=1
+        repo_method_name=common-backend
+        ;;
+        *) repo_method_name=$method;;
+    esac
+
+    local reponame="predictprotein-webserver-${repo_method_name}"
     local git_url="${url_base}/${reponame}"
 
-    local servername=
     case $method in
         boctopus2) servername=dev.boctopus.bioshu.se;;
         scampi2) servername=dev.scampi.bioshu.se;;
+        *web_common_backend*) servername=$ipaddress;;
         *) servername=dev.${method}.bioshu.se;;
     esac
+
 
     pushd $webserver_base
     if [ ! -d $reponame ];then
@@ -84,14 +100,22 @@ InstallWebServer(){
     popd
 
     # creating config files
-    local exampleconf=$rundir/topcons2.apache2.conf.example
+    local exampleconf=${rundir}/topcons2.apache2.conf.example
     if [ -d /etc/httpd ];then
-        exampleconf=$rundir/topcons2.httpd.conf.example
+        exampleconf=${rundir}/topcons2.httpd.conf.example
     fi
     local conffile=/etc/httpd/conf.d/${method}.conf
     if [ ! -s $conffile ] ;then
         sed "s/topcons2/${method}/g" $exampleconf | sed "s/dev.topcons.bioshu.se/${servername}/g" | sudo tee $conffile 1> /dev/null
     fi
+
+    if [ "$isBackend" -eq 1 ];then
+        local exampleconf=${rundir}/web_common_backend.conf.example 
+        local conffile=/etc/apache2/conf.d/${method}.conf
+        if [ ! -s $conffile ] ;then
+            sed "s/90.147.102.44/${servername}/g" | sudo tee $conffile 1> /dev/null
+        fi
+    fi  
 }
 
 
@@ -105,6 +129,7 @@ while [ "$1" != "" ]; do
     elif [ "${1:0:1}" == "-" ]; then
         case $1 in
             -h | --help) echo "$usage"; exit;;
+            -w) webserver_base=$2;shift;;
             -q|-quiet|--quiet) isQuiet=1;;
             -debug|--debug) isDebug=1;;
             -*) echo Error! Wrong argument: $1 >&2; exit;;

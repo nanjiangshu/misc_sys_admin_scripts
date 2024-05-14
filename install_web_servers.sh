@@ -111,7 +111,7 @@ InstallWebServer(){
 
     if [ "$isBackend" -eq 1 ];then
         local exampleconf=${rundir}/web_common_backend.conf.example 
-        local conffile=/etc/apache2/conf.d/${method}.conf
+        conffile=/etc/apache2/conf.d/${method}.conf
         if [ ! -s $conffile ] ;then
             sed "s/90.147.102.44/${servername}/g" | sudo tee $conffile 1> /dev/null
         fi

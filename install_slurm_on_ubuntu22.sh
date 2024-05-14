@@ -19,3 +19,5 @@ sudo systemctl enable slurmctld.service
 sudo systemctl start slurmctld.service
 
 bash $rundir/reload_slurm.sh
+
+sudo scontrol update nodename=$hostname state=idle 

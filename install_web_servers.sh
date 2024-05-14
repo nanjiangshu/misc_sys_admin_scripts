@@ -117,7 +117,7 @@ InstallWebServer(){
         fi
     fi  
 
-    sudo a2ensite $method
+    sudo a2enconf $method
     sudo systemctl reload apache2 
 }
 

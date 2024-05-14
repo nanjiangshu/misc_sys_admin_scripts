@@ -12,11 +12,12 @@ Options:
   -u, --user   USER   Set the username
   -l, --list   FILE   Set the file contains a list of hosts
   -s, --script FILE   Set the script file
+  -g, --args    STR   Set the arguments for the script 
   -c, --command STR   Set the command to be run
   -sudo               Wether run as sudo
   -h, --help          Print this help message and exit
 
-Created 2022-01-21, updated 2022-01-21, Nanjiang Shu
+Created 2022-01-21, updated 2024-05-14, Nanjiang Shu
 "
 
 RunScriptOnRemote() {
@@ -30,7 +31,7 @@ RunScriptOnRemote() {
     if [ $isQuiet -eq 0 ] ;then
         echo "Running $scriptfile on $host_with_user"
     fi
-    cat $scriptfile | ssh -o StrictHostKeyChecking=no $host_with_user $sudo bash
+    ssh -o StrictHostKeyChecking=no $host_with_user "$sudo bash -s" <$scriptfile -- $script_argument 
 }
 RunCmdOnRemote() {
     local host=$1
@@ -51,6 +52,7 @@ hostList=()
 isQuiet=0
 sudo=
 cmdline=
+script_argument=
 
 if [ $# -lt 1 ]; then
     echo "$usage"
@@ -71,6 +73,7 @@ while [ "$1" != "" ]; do
             -l|--list) hostListFile=$2;shift;;
             -s|-script|--script) scriptfile=$2;shift;;
             -c|--c|--command) cmdline="$2";shift;;
+            -g|--g|--args) script_argument="$2";shift;;
             -q|--quiet) isQuiet=1;;
             -sudo|--sudo) sudo=sudo;;
             -*) echo "Error! Wrong argument: $1">&2; exit;;

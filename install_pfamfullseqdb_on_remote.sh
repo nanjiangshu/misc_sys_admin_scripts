@@ -2,10 +2,10 @@
 # install the pfamfullseqdb and pfam databases on the remote server
 # the version of the pfamfullseqdb and pfam databases should be the same
 usage="""
-USAGE: $0 <version> HOST [HOST ...] 
+USAGE: $0 <version> <HOST> [<HOST> ...] 
 """
 
-if [ -z "$1" ]; then
+if [ "$#" -lt 2 ]; then
     echo "$usage"
     exit 1
 fi
@@ -50,7 +50,7 @@ install_pfamfullseqdb_on_remote() {
     local host=$1
     install_pfamfullseqdb $host
     install_pfam $host
-    bash $rundir/update_pfamfullseqdb_symlink.sh $version $host
+    $rundir/run_script_on_remote.sh -s $rundir/update_pfamfullseqdb_symlink.sh -g "$version" $host
 }
 
 for host in "${hostlist[@]}"; do

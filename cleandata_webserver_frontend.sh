@@ -22,6 +22,6 @@ serverlist="proq3 topcons2 boctopus2 scampi2 pathopred.bioinfo.se pconsc3 prodre
 for server in $serverlist; do 
     if [ -d /var/www/html/$server/ ];then
         find /var/www/html/$server/proj/pred/static/tmp -maxdepth 1 -type d  -ctime +30 -name "tmp_*"  -print0 | xargs -I{} -0 sudo rm -rf
-        find /var/www/html/$server/proj/pred/static/tmp -maxdepth 1 -type f  -ctime +30 -name "slurm_*"  -print0 | xargs -I{} -0 sudo rm -f
+        find /var/www/html/$server/proj/pred/static/tmp -maxdepth 1 -type f  -ctime +30 -name "slurm*"  -print0 | xargs -I{} -0 sudo rm -f
     fi
 done

@@ -22,7 +22,7 @@ serverlist="proq3 topcons2 boctopus2 scampi2 pathopred.bioinfo.se pconsc3 prodre
 for server in $serverlist; do 
     datapath=/var/www/html/$server/proj/pred/static/tmp
     if [ -d $datapath  ];then
-        find $datapath -maxdepth 1 -type d -ctime +30 -name "tmp_*"  -exec sudo rm -f {} +
+        find $datapath -maxdepth 1 -type d -ctime +30 -name "tmp_*"  -exec sudo rm -rf {} +
         find $datapath -maxdepth 1 -type f -ctime +30 -name "slurm*" -exec sudo rm -f {} +
     fi
 done

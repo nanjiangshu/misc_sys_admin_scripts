@@ -16,6 +16,7 @@ serverlist="proq3 topcons2 boctopus2 scampi2 pathopred.bioinfo.se pconsc3 prodre
 for server in $serverlist; do 
     datapath=/var/www/html/$server/proj/pred/static/result/cache
     if [ -d $datapath ];then
+        echo "cleaning archived results (>365 days) for $server"
         find $datapath -type f -ctime +365 -name "*.zip" -exec sudo rm -f {} +
     fi
 done

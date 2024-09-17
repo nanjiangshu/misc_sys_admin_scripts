@@ -25,4 +25,14 @@ for server in $serverlist; do
         find $datapath -maxdepth 1 -type d -ctime +30 -name "tmp_*"  -exec sudo rm -rf {} +
         find $datapath -maxdepth 1 -type f -ctime +30 -name "slurm*" -exec sudo rm -f {} +
     fi
+    datapath=/var/www/html/$server/proj/pred/static/result
+    if [ -d $datapath  ];then
+        rstdirlist=$(find $datapath -maxdepth 1 -type d -ctime +365 -name "rst_*")
+        for rstdir in $rstdirlist; do
+            if [ ! -f $rstdir/query.fa ]; then
+                sudo rm -rf $rstdir
+            fi
+        done
+    fi
+
 done

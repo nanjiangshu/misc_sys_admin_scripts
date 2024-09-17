@@ -18,5 +18,6 @@ for server in $serverlist; do
     if [ -d $datapath ];then
         echo "cleaning archived results (>365 days) for $server"
         find $datapath -type f -ctime +365 -name "*.zip" -exec sudo rm -f {} +
+        find $datapath -maxdepth 2 -type d -ctime +365  -exec sudo rm -rf {} +
     fi
 done

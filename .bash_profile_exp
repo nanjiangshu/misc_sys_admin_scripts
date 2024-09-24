@@ -47,4 +47,10 @@ my_squeue(){
     squeue --format="%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R"
 }
 
+golint(){
+        LINT_INCLUDE="-E bodyclose,gocritic,gofmt,gosec,govet,nestif,nlreturn,revive,rowserrcheck"
+        LINT_EXCLUDE="-e G401,G501,G107"
+        golangci-lint run $LINT_INCLUDE $LINT_EXCLUDE
+}
+
 export PATH

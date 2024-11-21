@@ -10,6 +10,8 @@ sudo ufw allow from 212.25.149.237 to any port 22
 sudo ufw allow from 212.25.149.237 to any port 2022
 sudo ufw allow from 130.243.159.173/16 to any port 22
 sudo ufw allow from 130.243.159.173/16 to any port 2022
+sudo ufw allow 80/tcp   # Allow HTTP traffic
+sudo ufw allow 443/tcp  # Allow HTTPS traffic
 sudo ufw deny 22
 sudo ufw enable
 sudo systemctl enable ufw

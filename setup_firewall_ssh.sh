@@ -14,6 +14,13 @@ sudo ufw allow from 83.185.46.245 to any port 22
 sudo ufw allow from 83.185.46.245 to any port 2022
 sudo ufw allow 80/tcp   # Allow HTTP traffic
 sudo ufw allow 443/tcp  # Allow HTTPS traffic
+
+# Allow any connection from Docker
+dockerSubnet=$(docker network inspect bridge | grep Subnet | awk '{print $2}' | awk -F\" '{print $2}')
+if [ "$dockerSubnet" != "" ]; then
+    sudo ufw allow from $dockerSubnet
+fi
+
 sudo ufw deny 22
 sudo ufw enable
 sudo systemctl enable ufw

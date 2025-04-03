@@ -21,7 +21,7 @@ sudo ufw allow 8081
 sudo ufw allow 8080
 
 # Move deny SSH to the end to avoid overriding previous allow rules
-sudo ufw insert 1 deny 22
+sudo ufw deny 22
 
 sudo ufw enable
 sudo systemctl enable ufw

@@ -12,6 +12,8 @@ sudo ufw allow from 130.243.0.0/16 to any port 22
 sudo ufw allow from 130.243.0.0/16 to any port 2022
 sudo ufw allow from 83.185.46.245 to any port 22
 sudo ufw allow from 83.185.46.245 to any port 2022
+sudo ufw allow from 212.25.147.10 to any port 22
+sudo ufw allow from 212.25.147.10 to any port 2022
 
 sudo ufw allow 80/tcp   # Allow HTTP traffic
 sudo ufw allow 443/tcp  # Allow HTTPS traffic

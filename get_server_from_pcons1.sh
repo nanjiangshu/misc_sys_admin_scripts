@@ -41,9 +41,6 @@ trap 'rm -f "$LOCKFILE"' INT TERM EXIT
 RUNDIR="$(dirname "$0")"
 cd "$RUNDIR" || { log "Failed to cd to $RUNDIR"; exit 1; }
 
-# Load ssh key
-eval "$(keychain --eval id_rsa_withph)"
-
 # Target host
 TARGETHOST="pcons1"
 
@@ -52,7 +49,7 @@ BASE_OPTS="--exclude=~* --exclude=*~ --exclude=.*.sw[mopn]"
 EXCLUDE_OPTS="/var/www/frag1d /var/www/predzinc /var/www/pcons/PCONSMETA /var/www/pcons/CASP* /var/www/pcons/casp /var/www/pcons/test /var/www/pcons/data /var/www/pcons/share /var/www/pcons/download /var/www/pcons/bin /var/www/pcons/misc /var/www/pcons/bak tmp/[0-9a-zA-Z]* result/[0-9a-zA-Z]* static/md5 docroot/md5 debug/md5 release/md5 plots output svmouput .dump_tmp *.gz stat archive cached_job_finished_date.sqlite3_*"
 EXCLUDE_OPTS2="topcons/uniref90_2014_5.fasta topcons/uniref90.mem.fasta* download/prodres_db download/pconsc2-vm.zip release/.dump_tmp tmbmodel-seq/BLAST/nr.*"
 
-RSYNC_SSH="ssh -o StrictHostKeyChecking=no"
+RSYNC_SSH="ssh -i ~/.ssh/id_rsa_backup -o StrictHostKeyChecking=no"
 
 #============================================================
 # Function to run rsync with logging

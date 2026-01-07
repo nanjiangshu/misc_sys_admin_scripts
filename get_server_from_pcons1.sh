@@ -62,7 +62,7 @@ run_rsync() {
     local DEST="$BACKUP_DIR/$DEST_SUBDIR"
     mkdir -p "$DEST"
 
-    local CMD="rsync -auvz -e \"$RSYNC_SSH\" $BASE_OPTS"
+    local CMD="rsync -auv --inplace -e \"$RSYNC_SSH\" $BASE_OPTS"
 
     for ex in $EXCLUDE_OPTS; do
         CMD+=" --exclude=\"$ex\""
@@ -87,10 +87,10 @@ run_rsync() {
 
 #============================================================
 # Run rsync for each directory
-run_rsync "/server/" "server"
-run_rsync "/etc/httpd/" "httpd"
-run_rsync "/var/www/" "var/www"
 run_rsync "/big/src/" "big/src" "*.sh"
+run_rsync "/var/www/" "var/www"
+run_rsync "/etc/httpd/" "httpd"
+run_rsync "/server/" "server"
 
 #============================================================
 # Cleanup

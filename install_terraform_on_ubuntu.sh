@@ -4,7 +4,7 @@ set -euo pipefail
 # This script is used to install terraform on ubuntu
 
 sudo apt update
-sudo apt install -i git unzip
+sudo apt install git unzip
 
 # Clone the repository
 git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv

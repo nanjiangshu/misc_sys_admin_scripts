@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -- coding: utf-8 --
+# -*- coding: utf-8 -*-
 
 """
 Local Sensitive Data Redactor
@@ -30,19 +30,17 @@ import sys
 import re
 import argparse
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 # ==============================================================================
 # EXTENSIBLE REDACTION RULES CONFIGURATION
-# ==============================================================================
-# Add or modify rules here.
 # Supported keys per rule:
 #   - name (str): Human-readable label for debugging/logging.
 #   - pattern (str): Regular expression to match.
 #   - replacement (str): String or regex backreference (e.g. r"\1[REDACTED]").
 #   - flags (int, optional): Regex flags (default: re.IGNORECASE).
 # ==============================================================================
-
+# ==============================================================================
 REDACTION_RULES: List[Dict[str, Any]] = [
     # --------------------------------------------------------------------------
     # 1. Config Key-Value Pairs (e.g., s3cmd, .env, YAML, JSON, INI)
@@ -87,7 +85,7 @@ REDACTION_RULES: List[Dict[str, Any]] = [
     # --------------------------------------------------------------------------
     {
         "name": "PEM Private Key Block",
-        "pattern": r"-----BEGIN (?:RSA|OPENSSH|EC|PGP)? PRIVATE KEY-----[[\s\S]*?-----END (?:RSA|OPENSSH|EC|PGP)? PRIVATE KEY-----",
+        "pattern": r"-----BEGIN (?:RSA|OPENSSH|EC|PGP)? PRIVATE KEY-----[\s\S]*?-----END (?:RSA|OPENSSH|EC|PGP)? PRIVATE KEY-----",
         "replacement": "[REDACTED_PRIVATE_KEY]",
         "flags": re.IGNORECASE,
     },
@@ -135,20 +133,30 @@ REDACTION_RULES: List[Dict[str, Any]] = [
         "replacement": "[REDACTED_PHONE]",
         "flags": 0,
     },
+    {
+        "name": "Credit Card Number",
+        "pattern": r"\b(?:\d{4}[- ]?){3}\d{4}\b",
+        "replacement": "[REDACTED_CREDIT_CARD]",
+        "flags": 0,
+    },
 ]
 
 
-def redact_text(text: str, rules: List[Dict[str, Any]] = REDACTION_RULES) -> str:
+def redact_text(text: str, rules: Optional[List[Dict[str, Any]]] = None) -> str:
     """
     Applies the list of redaction rules sequentially to the input text.
 
     Args:
         text (str): Raw string content.
-        rules (list): List of rule dictionaries containing pattern and replacement.
+        rules (list, optional): List of rule dictionaries containing pattern and replacement.
+                                Defaults to REDACTION_RULES.
 
     Returns:
         str: Sanitized text.
     """
+    if rules is None:
+        rules = REDACTION_RULES
+
     sanitized_text = text
     for rule in rules:
         flags = rule.get("flags", re.IGNORECASE)
@@ -200,7 +208,7 @@ def main() -> None:
         try:
             with open(in_path, "r", encoding="utf-8", errors="ignore") as f:
                 raw_data = f.read()
-        except Exception as e:
+        except OSError as e:
             sys.stderr.write(f"Error reading file '{args.input_file}': {e}\n")
             sys.exit(1)
     else:
@@ -222,7 +230,7 @@ def main() -> None:
             with open(out_path, "w", encoding="utf-8") as f:
                 f.write(sanitized_data)
             sys.stderr.write(f"Successfully saved redacted content to: {out_path}\n")
-        except Exception as e:
+        except OSError as e:
             sys.stderr.write(f"Error writing to output file '{args.output_file}': {e}\n")
             sys.exit(1)
     else:

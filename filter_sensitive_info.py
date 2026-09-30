@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Local Sensitive Data Redactor
@@ -19,31 +18,38 @@ Usage:
 3. Use in a Linux pipeline (STDIN -> STDOUT):
    $ cat config.conf | python filter_sensitive_info.py > clean.conf
    $ grep "ERROR" app.log | python filter_sensitive_info.py
-
-Extensibility:
---------------
-To add a new redaction rule, simply append a dictionary to `REDACTION_RULES`.
-Rules support both simple pattern replacements and regex capture-group replacements.
 """
 
 import sys
 import re
 import argparse
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import TypedDict
+
+
+# Define explicit schema for rules
+class RedactionRule(TypedDict, total=False):
+    """
+    Schema for a redaction rule.
+
+    Attributes:
+        name (str): A descriptive name for the rule.
+        pattern (str): The regex pattern to match sensitive information.
+        replacement (str): The string to replace the matched content with.
+        flags (int): Regex flags (e.g., re.IGNORECASE).
+    """
+    name: str
+    pattern: str
+    replacement: str
+    flags: int
+
 
 # ==============================================================================
 # EXTENSIBLE REDACTION RULES CONFIGURATION
-# Supported keys per rule:
-#   - name (str): Human-readable label for debugging/logging.
-#   - pattern (str): Regular expression to match.
-#   - replacement (str): String or regex backreference (e.g. r"\1[REDACTED]").
-#   - flags (int, optional): Regex flags (default: re.IGNORECASE).
 # ==============================================================================
-# ==============================================================================
-REDACTION_RULES: List[Dict[str, Any]] = [
+REDACTION_RULES: list[RedactionRule] = [
     # --------------------------------------------------------------------------
-    # 1. Config Key-Value Pairs (e.g., s3cmd, .env, YAML, JSON, INI)
+    # 1. Config Key-Value Pairs
     # --------------------------------------------------------------------------
     {
         "name": "Config Key-Value Secrets",
@@ -51,9 +57,8 @@ REDACTION_RULES: List[Dict[str, Any]] = [
         "replacement": r"\1[REDACTED_VALUE]",
         "flags": re.IGNORECASE,
     },
-
     # --------------------------------------------------------------------------
-    # 2. Direct Access Links & Cloud Storage URLs
+    # 2. Cloud Storage URLs
     # --------------------------------------------------------------------------
     {
         "name": "Google Docs / Drive Links",
@@ -79,9 +84,8 @@ REDACTION_RULES: List[Dict[str, Any]] = [
         "replacement": "[REDACTED_URL_WITH_PARAMS]",
         "flags": re.IGNORECASE,
     },
-
     # --------------------------------------------------------------------------
-    # 3. Private Keys, API Keys & Authentication Tokens
+    # 3. Keys & Tokens
     # --------------------------------------------------------------------------
     {
         "name": "PEM Private Key Block",
@@ -101,9 +105,8 @@ REDACTION_RULES: List[Dict[str, Any]] = [
         "replacement": "[REDACTED_GITHUB_TOKEN]",
         "flags": 0,
     },
-
     # --------------------------------------------------------------------------
-    # 4. Personal Identification Numbers (PII)
+    # 4. PII & Identification
     # --------------------------------------------------------------------------
     {
         "name": "Swedish Personal Number (Personnummer)",
@@ -117,7 +120,6 @@ REDACTION_RULES: List[Dict[str, Any]] = [
         "replacement": "[REDACTED_US_SSN]",
         "flags": 0,
     },
-
     # --------------------------------------------------------------------------
     # 5. Contact Information
     # --------------------------------------------------------------------------
@@ -142,18 +144,8 @@ REDACTION_RULES: List[Dict[str, Any]] = [
 ]
 
 
-def redact_text(text: str, rules: Optional[List[Dict[str, Any]]] = None) -> str:
-    """
-    Applies the list of redaction rules sequentially to the input text.
-
-    Args:
-        text (str): Raw string content.
-        rules (list, optional): List of rule dictionaries containing pattern and replacement.
-                                Defaults to REDACTION_RULES.
-
-    Returns:
-        str: Sanitized text.
-    """
+def redact_text(text: str, rules: list[RedactionRule] | None = None) -> str:
+    """Applies redaction rules sequentially to input text."""
     if rules is None:
         rules = REDACTION_RULES
 
@@ -161,9 +153,9 @@ def redact_text(text: str, rules: Optional[List[Dict[str, Any]]] = None) -> str:
     for rule in rules:
         flags = rule.get("flags", re.IGNORECASE)
         try:
-            sanitized_text = re.sub(rule["pattern"], rule["replacement"], sanitized_text, flags=flags)
+            sanitized_text = re.sub(rule.get("pattern", ""), rule.get("replacement", ""), sanitized_text, flags=flags)
         except re.error as err:
-            sys.stderr.write(f"Warning: Skipping rule '{rule['name']}' due to regex error: {err}\n")
+            sys.stderr.write(f"Warning: Skipping rule '{rule.get('name')}' due to regex error: {err}\n")
 
     return sanitized_text
 
@@ -177,26 +169,28 @@ def parse_arguments() -> argparse.Namespace:
   python filter_sensitive_info.py input.txt
   python filter_sensitive_info.py input.txt -o sanitized.txt
   cat input.txt | python filter_sensitive_info.py
-"""
+""",
     )
     parser.add_argument(
         "input_file",
         nargs="?",
         type=str,
         default=None,
-        help="Path to input file. If omitted, reads from standard input (STDIN)."
+        help="Path to input file. If omitted, reads from standard input (STDIN).",
     )
     parser.add_argument(
-        "-o", "--output",
+        "-o",
+        "--output",
         dest="output_file",
         type=str,
         default=None,
-        help="Path to output file. If omitted, prints to standard output (STDOUT)."
+        help="Path to output file. If omitted, prints to standard output (STDOUT).",
     )
     return parser.parse_args()
 
 
 def main() -> None:
+    """Main entry point for the script."""
     args = parse_arguments()
 
     # 1. Read input data from File or STDIN pipe
@@ -206,13 +200,11 @@ def main() -> None:
             sys.stderr.write(f"Error: File '{args.input_file}' not found.\n")
             sys.exit(1)
         try:
-            with open(in_path, "r", encoding="utf-8", errors="ignore") as f:
-                raw_data = f.read()
+            raw_data = in_path.read_text(encoding="utf-8", errors="ignore")
         except OSError as e:
             sys.stderr.write(f"Error reading file '{args.input_file}': {e}\n")
             sys.exit(1)
     else:
-        # Check if stdin has data (pipe or redirect)
         if not sys.stdin.isatty():
             raw_data = sys.stdin.read()
         else:
@@ -227,8 +219,7 @@ def main() -> None:
     if args.output_file:
         out_path = Path(args.output_file)
         try:
-            with open(out_path, "w", encoding="utf-8") as f:
-                f.write(sanitized_data)
+            out_path.write_text(sanitized_data, encoding="utf-8")
             sys.stderr.write(f"Successfully saved redacted content to: {out_path}\n")
         except OSError as e:
             sys.stderr.write(f"Error writing to output file '{args.output_file}': {e}\n")

@@ -152,7 +152,7 @@ REDACTION_RULES: list[RedactionRule] = [
             r'(\b"?(?:'
             r'dbPassword|db_password|mqPassword|mq_password|password|passwd|pwd|'
             r'token|accessKey|access_key|secretKey|secret_key|secret|secretName|secret_name|'
-            r'passphrase|iss|api_key|apikey|auth_token|bearer_token|id|result|rotatePubKeyData'
+            r'passphrase|iss|api_key|apikey|auth_token|bearer_token|id|result|rotatePubKeyData|bcrypt_hash'
             r')"?\s*[:=]\s*)'  # Capture key and separator (: or =)
             r'("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^\s,}\]#]+)'  # Capture value (quoted or unquoted)
         ),

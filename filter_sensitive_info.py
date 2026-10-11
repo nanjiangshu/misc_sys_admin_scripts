@@ -141,6 +141,34 @@ REDACTION_RULES: list[RedactionRule] = [
         "replacement": "[REDACTED_CREDIT_CARD]",
         "flags": 0,
     },
+    # --------------------------------------------------------------------------
+    # HCL / Terraform / JSON / Config Key-Value Secrets
+    # --------------------------------------------------------------------------
+    {
+        "name": "Terraform / HCL Sensitive Key Redactor",
+        # Matches keys like: dbPassword, db_password, mqPassword, token, accessKey,
+        # secretKey, passphrase, secretName, iss, api_key, etc.
+        "pattern": (
+            r'(\b"?(?:'
+            r'dbPassword|db_password|mqPassword|mq_password|password|passwd|pwd|'
+            r'token|accessKey|access_key|secretKey|secret_key|secret|secretName|secret_name|'
+            r'passphrase|iss|api_key|apikey|auth_token|bearer_token'
+            r')"?\s*[:=]\s*)'  # Capture key and separator (: or =)
+            r'("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^\s,}\]#]+)'  # Capture value (quoted or unquoted)
+        ),
+        "replacement": r'\1"[REDACTED_VALUE]"',
+        "flags": re.IGNORECASE,
+    },
+
+    # --------------------------------------------------------------------------
+    # Terraform Environment / Map Block Assignments (e.g. TF_VAR_*, sensitive variables)
+    # --------------------------------------------------------------------------
+    {
+        "name": "Terraform TF_VAR or Environment Variables",
+        "pattern": r'(\b(?:TF_VAR_[A-Za-z0-9_]*password[A-Za-z0-9_]*|TF_VAR_[A-Za-z0-9_]*secret[A-Za-z0-9_]*|TF_VAR_[A-Za-z0-9_]*token[A-Za-z0-9_]*)\s*[:=]\s*)("[^"]+"|\'[^\']+\'|[^\s]+)',
+        "replacement": r'\1"[REDACTED_VALUE]"',
+        "flags": re.IGNORECASE,
+    },
 ]
 
 

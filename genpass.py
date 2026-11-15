@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+import argparse
 import os
 import secrets
 
-# A starter list of crisp, unambiguous, easy-to-type words (no homophones or tricky spellings)
 WORDS = [
     "anchor",
     "apricot",
@@ -159,10 +159,6 @@ WORDS = [
 
 
 def load_wordlist():
-  """Uses the system dictionary (filtered for clean 5-8 letter words) if available,
-
-    giving ~70+ bits of entropy; otherwise falls back to the built-in list.
-    """
   dict_paths = ["/usr/share/dict/words", "/usr/share/dict/american-english"]
   for path in dict_paths:
     if os.path.exists(path):
@@ -179,23 +175,37 @@ def load_wordlist():
   return WORDS
 
 
-def generate_passphrase(num_words=4, capitalize=True, add_number=True):
-  wordlist = load_wordlist()
+def generate_passphrase(
+    wordlist, num_words=4, capitalize=True, add_number=True
+):
   separator = secrets.choice(["-", ".", "_"])
-
   chosen = [secrets.choice(wordlist) for _ in range(num_words)]
+
   if capitalize:
     chosen = [w.capitalize() for w in chosen]
 
   if add_number:
-    # Appends a random 2-digit number (10-99) to satisfy strict site rules
-    number = str(secrets.randbelow(90) + 10)
-    chosen.append(number)
+    chosen.append(str(secrets.randbelow(90) + 10))
 
   return separator.join(chosen)
 
 
 if __name__ == "__main__":
-  print("Generated Passphrases:\n")
-  for _ in range(5):
-    print(" ", generate_passphrase(num_words=4))
+  parser = argparse.ArgumentParser(
+      description="Generate an easy-to-type passphrase."
+  )
+  parser.add_argument(
+      "-w", "--words", type=int, default=4, help="Number of words (default: 4)"
+  )
+  parser.add_argument(
+      "-n",
+      "--count",
+      type=int,
+      default=1,
+      help="Number of passphrases to generate (default: 1)",
+  )
+  args = parser.parse_args()
+
+  wordlist = load_wordlist()
+  for _ in range(args.count):
+    print(generate_passphrase(wordlist, num_words=args.words))
